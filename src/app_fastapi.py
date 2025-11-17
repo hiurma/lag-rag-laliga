@@ -30,7 +30,6 @@ from typing import List
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # --- CORS ---
@@ -43,9 +42,17 @@ origins: List[str] = [
     "*",  # si quieres ir a lo fácil
 ]
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://hiurma.github.io",
+        "https://hiurma.github.io/laliga-chat-web",
+        "https://hiurma.github.io/laliga-chat-web/",
+        "https://hiurma.github.io/laliga-chat-web/index.html"
+        "http://localhost:8000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
