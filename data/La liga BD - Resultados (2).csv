@@ -1,0 +1,751 @@
+Jornada,Local_ID,Local,Visitante,Visitante_ID,Goles_local,goles_visitante,Resultado,Marcador,Temporada
+1,ESP_GIR,Girona,Rayo Vallecano,ESP_RAY,1,3,Visitante,1-3,2025/2026
+1,ESP_VIL,Villarreal,Real Oviedo,ESP_ROV,2,0,Local,2-0,2025/2026
+1,ESP_MLL,RCD Mallorca,Barcelona,ESP_FCB,0,3,Visitante,0-3,2025/2026
+1,ESP_ALA,Deportivo Alaves,Levante UD ,ESP_LEV,2,1,Local,2-1,2025/2026
+1,ESP_VAL,Valencia CF,Real Sociedad,ESP_RSO,1,1,Empate,1-1,2025/2026
+1,ESP_CEL,Celta de Vigo,Getafe CF,ESP_GET,0,2,Visitante,0-2,2025/2026
+1,ESP_ATH,Athletic club,Sevilla FC,ESP_SEV,3,2,Local,3-2,2025/2026
+1,ESP_ESP,RCD Espanyol,Atletico de Madrid,ESP_ATM,2,1,Local,2-1,2025/2026
+1,ESP_ELC,Elche CF,Betis,ESP_BET,1,1,Empate,1-1,2025/2026
+1,ESP_RMA,Real Madrid,CA Osasuna,ESP_OSA,1,0,Local,1-0,2025/2026
+2,ESP_BET,Betis,Alaves,ESP_ALA,1,0,Local,1-0,2025/2026
+2,ESP_MLL,RCD Mallorca ,Celta de Vigo,ESP_CEL,1,1,Empate,1-1,2025/2026
+2,ESP_ATM,Atletico de Madrid,Elche CF,ESP_ELC,1,1,Empate,1-1,2025/2026
+2,ESP_LEV,Levante,FC Barcelona,ESP_FCB,2,3,Visitante,2-3,2025/2026
+2,ESP_OSA,Osasuna,Valencia,ESP_VAL,1,0,Local,1-0,2025/2026
+2,ESP_VIL,Villarreal,Girona,ESP_GIR,5,0,Local,5-0,2025/2026
+2,ESP_RSO,Real Sociedad,RCD Espanyol,ESP_ESP,2,2,Empate,2-2,2025/2026
+2,ESP_ROV,Real Oviedo,Real Madrid,ESP_RMA,0,3,Visitante,0-3,2025/2026
+2,ESP_ATH,Athletic club,Rayo Vallecano,ESP_RAY,1,0,Local,1-0,2025/2026
+2,ESP_SEV,Sevilla FC,Getafe CF,ESP_GET,1,2,Visitante,1-2,2025/2026
+3,ESP_ELC,Elche CF,Levante UD ,ESP_LEV,2,0,Local,2-0,2025/2026
+3,ESP_VAL,Valencia CF,Getafe CF,ESP_GET,3,0,Local,3-0,2025/2026
+3,ESP_ALA,Deportivo Alaves,Atletico de Madrid,ESP_ATM,1,1,Empate,1-1,2025/2026
+3,ESP_ROV,Real Oviedo,Real Sociedad,ESP_RSO,1,0,Local,1-0,2025/2026
+3,ESP_GIR,Girona,Sevilla FC,ESP_SEV,0,2,Visitante,0-2,2025/2026
+3,ESP_RMA,Real Madrid,RCD Mallorca ,ESP_MLL,2,1,Local,2-1,2025/2026
+3,ESP_CEL,Celta de Vigo,Villarreal,ESP_VIL,1,1,Empate,1-1,2025/2026
+3,ESP_BET,Betis,Athletic Club,ESP_ATH,1,2,Visitante,1-2,2025/2026
+3,ESP_ESP,RCD Espanyol,Osasuna,ESP_OSA,1,0,Local,1-0,2025/2026
+3,ESP_RAY,Rayo Vallecano,FC Barcelona,ESP_FCB,1,1,Empate,1-1,2025/2026
+4,ESP_SEV,Sevilla FC,Elche CF,ESP_ELC,2,2,Empate,2-2,2025/2026
+4,ESP_GET,Getafe,Real Oviedo,ESP_ROV,2,0,Local,2-0,2025/2026
+4,ESP_RSO,Real Sociedad,Real Madrid,ESP_RMA,1,2,Visitante,1-2,2025/2026
+4,ESP_ATH,Athletic club,Deportivo Alaves,ESP_ALA,0,1,Visitante,0-1,2025/2026
+4,ESP_ATM,Atletico de Madrid,Villarreal,ESP_VIL,2,0,Local,2-0,2025/2026
+4,ESP_CEL,Celta de Vigo,Girona,ESP_GIR,1,1,Empate,1-1,2025/2026
+4,ESP_LEV,Levante,Betis,ESP_BET,2,2,Empate,2-2,2025/2026
+4,ESP_OSA,Osasuna,Rayo Vallecano,ESP_RAY,2,0,Local,2-0,2025/2026
+4,ESP_FCB,FC Barcelona,Valencia,ESP_VAL,6,0,Local,6-0,2025/2026
+4,ESP_ESP,RCD Espanyol,RCD Mallorca ,ESP_MLL,3,2,Local,3-2,2025/2026
+1,ESP_ATH,Ath Bilbao,Getafe,ESP_GET,1,1,Empate,1-1,2024/2025
+1,ESP_BET,Betis,Girona,ESP_GIR,1,1,Empate,1-1,2024/2025
+1,ESP_CEL,Celta,Alaves,ESP_ALA,2,1,Local,2-1,2024/2025
+1,ESP_PAL,Las Palmas,Sevilla,ESP_SEV,2,2,Empate,2-2,2024/2025
+1,ESP_OSA,Osasuna,Leganes,ESP_LEG,1,1,Empate,1-1,2024/2025
+1,ESP_VAL,Valencia,Barcelona,ESP_FCB,1,2,Visitante,1-2,2024/2025
+1,ESP_RSO,Sociedad,Vallecano,ESP_RAY,1,2,Visitante,1-2,2024/2025
+1,ESP_MLL,Mallorca,Real Madrid,ESP_RMA,1,1,Empate,1-1,2024/2025
+1,ESP_VALLA,Valladolid,Espanol,ESP_ESP,1,0,Local,1-0,2024/2025
+1,ESP_VILL,Villarreal,Ath Madrid,ESP_ATM,2,2,Empate,2-2,2024/2025
+2,ESP_CEL,Celta,Valencia,ESP_VAL,3,1,Local,3-1,2024/2025
+2,ESP_SEV,Sevilla,Villarreal,ESP_VIL,1,2,Visitante,1-2,2024/2025
+2,ESP_OSA,Osasuna,Mallorca,ESP_MLL,1,0,Local,1-0,2024/2025
+2,ESP_FCB,Barcelona,Ath Bilbao,ESP_ATH,2,1,Local,2-1,2024/2025
+2,ESP_ESP,Espanol,Sociedad,ESP_RSO,0,1,Visitante,0-1,2024/2025
+2,ESP_GET,Getafe,Vallecano,ESP_RAY,0,0,Empate,0-0,2024/2025
+2,ESP_RMA,Real Madrid,Valladolid,ESP_VALLA,3,0,Local,3-0,2024/2025
+2,ESP_LEG,Leganes,Las Palmas,ESP_PAL,2,1,Local,2-1,2024/2025
+2,ESP_ALA,Alaves,Betis,ESP_BET,0,0,Empate,0-0,2024/2025
+2,ESP_ATH,Ath Madrid,Girona,ESP_GIR,3,0,Local,3-0,2024/2025
+3,ESP_VIL,Villarreal,Celta,ESP_CEL,4,3,Local,4-3,2024/2025
+3,ESP_MLL,Mallorca,Sevilla,ESP_SEV,0,0,Empate,0-0,2024/2025
+3,ESP_RAY,Vallecano,Barcelona,ESP_FCB,1,2,Visitante,1-2,2024/2025
+3,ESP_ATH,Ath Bilbao,Valencia,ESP_VAL,1,0,Local,1-0,2024/2025
+3,ESP_VALLA,Valladolid,Leganes,ESP_LEG,0,0,Empate,0-0,2024/2025
+3,ESP_ATM,Ath Madrid,Espanol,ESP_ESP,0,0,Empate,0-0,2024/2025
+3,ESP_RSO,Sociedad,Alaves,ESP_ALA,1,2,Visitante,1-2,2024/2025
+3,ESP_GIR,Girona,Osasuna,ESP_OSA,4,0,Local,4-0,2024/2025
+3,ESP_PAL,Las Palmas,Real Madrid,ESP_RMA,1,1,Empate,1-1,2024/2025
+3,ESP_FCB,Barcelona,Valladolid,ESP_VALLA,7,0,Local,7-0,2024/2025
+4,ESP_ATH,Ath Bilbao,Ath Madrid,ESP_ATM,0,1,Visitante,0-1,2024/2025
+4,ESP_ESP,Espanol,Vallecano,ESP_RAY,2,1,Local,2-1,2024/2025
+4,ESP_LEG,Leganes,Mallorca,ESP_MLL,0,1,Visitante,0-1,2024/2025
+4,ESP_VAL,Valencia,Villarreal,ESP_VIL,1,1,Empate,1-1,2024/2025
+4,ESP_ALA,Alaves,Las Palmas,ESP_PAL,2,0,Local,2-0,2024/2025
+4,ESP_OSA,Osasuna,Celta,ESP_CEL,3,2,Local,3-2,2024/2025
+4,ESP_SEV,Sevilla,Girona,ESP_GIR,0,2,Visitante,0-2,2024/2025
+4,ESP_GET,Getafe,Sociedad,ESP_RSO,0,0,Empate,0-0,2024/2025
+4,ESP_RMA,Real Madrid,Betis,ESP_BET,2,0,Local,2-0,2024/2025
+4,ESP_BET,Betis,Leganes,ESP_LEG,2,0,Local,2-0,2024/2025
+5,ESP_MLL,Mallorca,Villarreal,ESP_VIL,1,2,Visitante,1-2,2024/2025
+5,ESP_ESP,Espanol,Alaves,ESP_ALA,3,2,Local,3-2,2024/2025
+5,ESP_SEV,Sevilla,Getafe,ESP_GET,1,0,Local,1-0,2024/2025
+5,ESP_RSO,Sociedad,Real Madrid,ESP_RMA,0,2,Visitante,0-2,2024/2025
+5,ESP_CEL,Celta,Valladolid,ESP_VALLA,3,1,Local,3-1,2024/2025
+5,ESP_GIR,Girona,Barcelona,ESP_FCB,1,4,Visitante,1-4,2024/2025
+5,ESP_PAL,Las Palmas,Ath Bilbao,ESP_ATH,2,3,Visitante,2-3,2024/2025
+5,ESP_ATM,Ath Madrid,Valencia,ESP_VAL,3,0,Local,3-0,2024/2025
+5,ESP_RAY,Vallecano,Osasuna,ESP_OSA,3,1,Local,3-1,2024/2025
+5,ESP_MLL,Mallorca,Sociedad,ESP_RSO,1,0,Local,1-0,2024/2025
+6,ESP_BET,Betis,Getafe,ESP_GET,2,1,Local,2-1,2024/2025
+6,ESP_LEG,Leganes,Ath Bilbao,ESP_ATH,0,2,Visitante,0-2,2024/2025
+6,ESP_ALA,Alaves,Sevilla,ESP_SEV,2,1,Local,2-1,2024/2025
+6,ESP_VALLA,Valladolid,Sociedad,ESP_RSO,0,0,Empate,0-0,2024/2025
+6,ESP_OSA,Osasuna,Las Palmas,ESP_PAL,2,1,Local,2-1,2024/2025
+6,ESP_VAL,Valencia,Girona,ESP_GIR,2,0,Local,2-0,2024/2025
+6,ESP_RMA,Real Madrid,Espanol,ESP_ESP,4,1,Local,4-1,2024/2025
+6,ESP_GET,Getafe,Leganes,ESP_LEG,1,1,Empate,1-1,2024/2025
+6,ESP_ATH,Ath Bilbao,Celta,ESP_CEL,3,1,Local,3-1,2024/2025
+6,ESP_VIL,Villarreal,Barcelona,ESP_FCB,1,5,Visitante,1-5,2024/2025
+7,ESP_RAY,Vallecano,Ath Madrid,ESP_ATM,1,1,Empate,1-1,2024/2025
+7,ESP_BET,Betis,Mallorca,ESP_MLL,1,2,Visitante,1-2,2024/2025
+7,ESP_SEV,Sevilla,Valladolid,ESP_VALLA,2,1,Local,2-1,2024/2025
+7,ESP_VAL,Valencia,Osasuna,ESP_OSA,0,0,Empate,0-0,2024/2025
+7,ESP_RMA,Real Madrid,Alaves,ESP_ALA,3,2,Local,3-2,2024/2025
+7,ESP_GIR,Girona,Vallecano,ESP_RAY,0,0,Empate,0-0,2024/2025
+7,ESP_FCB,Barcelona,Getafe,ESP_GET,1,0,Local,1-0,2024/2025
+7,ESP_ESP,Espanol,Villarreal,ESP_VIL,1,2,Visitante,1-2,2024/2025
+7,ESP_PAL,Las Palmas,Betis,ESP_BET,1,1,Empate,1-1,2024/2025
+7,ESP_CEL,Celta,Ath Madrid,ESP_ATM,0,1,Visitante,0-1,2024/2025
+8,ESP_VALLA,Valladolid,Mallorca,ESP_MLL,1,2,Visitante,1-2,2024/2025
+8,ESP_GET,Getafe,Alaves,ESP_ALA,2,0,Local,2-0,2024/2025
+8,ESP_RAY,Vallecano,Leganes,ESP_LEG,1,1,Empate,1-1,2024/2025
+8,ESP_RSO,Sociedad,Valencia,ESP_VAL,3,0,Local,3-0,2024/2025
+8,ESP_OSA,Osasuna,Barcelona,ESP_FCB,4,2,Local,4-2,2024/2025
+8,ESP_CEL,Celta,Girona,ESP_GIR,1,1,Empate,1-1,2024/2025
+8,ESP_ATH,Ath Bilbao,Sevilla,ESP_SEV,1,1,Empate,1-1,2024/2025
+8,ESP_BET,Betis,Espanol,ESP_ESP,1,0,Local,1-0,2024/2025
+8,ESP_ATH,Ath Madrid,Real Madrid,ESP_RMA,1,1,Empate,1-1,2024/2025
+8,ESP_VIL,Villarreal,Las Palmas,ESP_PAL,3,1,Local,3-1,2024/2025
+9,ESP_LEG,Leganes,Valencia,ESP_VAL,0,0,Empate,0-0,2024/2025
+9,ESP_ESP,Espanol,Mallorca,ESP_MLL,2,1,Local,2-1,2024/2025
+9,ESP_GET,Getafe,Osasuna,ESP_OSA,1,1,Empate,1-1,2024/2025
+9,ESP_PAL,Las Palmas,Celta,ESP_CEL,0,1,Visitante,0-1,2024/2025
+9,ESP_VALLA,Valladolid,Vallecano,ESP_RAY,1,2,Visitante,1-2,2024/2025
+9,ESP_RMA,Real Madrid,Villarreal,ESP_VIL,2,0,Local,2-0,2024/2025
+9,ESP_GIR,Girona,Ath Bilbao,ESP_ATH,2,1,Local,2-1,2024/2025
+9,ESP_ALA,Alaves,Barcelona,ESP_FCB,0,3,Visitante,0-3,2024/2025
+9,ESP_SEV,Sevilla,Betis,ESP_BET,1,0,Local,1-0,2024/2025
+9,ESP_RSO,Sociedad,Ath Madrid,ESP_ATM,1,1,Empate,1-1,2024/2025
+10,ESP_ALA,Alaves,Valladolid,ESP_VALLA,2,3,Visitante,2-3,2024/2025
+10,ESP_ATH,Ath Bilbao,Espanol,ESP_ESP,4,1,Local,4-1,2024/2025
+10,ESP_OSA,Osasuna,Betis,ESP_BET,1,2,Visitante,1-2,2024/2025
+10,ESP_GIR,Girona,Sociedad,ESP_RSO,0,1,Visitante,0-1,2024/2025
+10,ESP_CEL,Celta,Real Madrid,ESP_RMA,1,2,Visitante,1-2,2024/2025
+10,ESP_MLL,Mallorca,Vallecano,ESP_RAY,1,0,Local,1-0,2024/2025
+10,ESP_ATM,Ath Madrid,Leganes,ESP_LEG,3,1,Local,3-1,2024/2025
+10,ESP_VIL,Villarreal,Getafe,ESP_GET,1,1,Empate,1-1,2024/2025
+10,ESP_FCB,Barcelona,Sevilla,ESP_SEV,5,1,Local,5-1,2024/2025
+10,ESP_VAL,Valencia,Las Palmas,ESP_PAL,2,3,Visitante,2-3,2024/2025
+11,ESP_ESP,Espanol,Sevilla,ESP_SEV,0,2,Visitante,0-2,2024/2025
+11,ESP_VALLA,Valladolid,Villarreal,ESP_VIL,1,2,Visitante,1-2,2024/2025
+11,ESP_RAY,Vallecano,Alaves,ESP_ALA,1,0,Local,1-0,2024/2025
+11,ESP_PAL,Las Palmas,Girona,ESP_GIR,1,0,Local,1-0,2024/2025
+11,ESP_RMA,Real Madrid,Barcelona,ESP_FCB,0,4,Visitante,0-4,2024/2025
+11,ESP_LEG,Leganes,Celta,ESP_CEL,3,0,Local,3-0,2024/2025
+11,ESP_GET,Getafe,Valencia,ESP_VAL,1,1,Empate,1-1,2024/2025
+11,ESP_BET,Betis,Ath Madrid,ESP_ATM,1,0,Local,1-0,2024/2025
+11,ESP_RSO,Sociedad,Osasuna,ESP_OSA,0,2,Visitante,0-2,2024/2025
+11,ESP_MLL,Mallorca,Ath Bilbao,ESP_ATH,0,0,Empate,0-0,2024/2025
+12,ESP_ALA,Alaves,Mallorca,ESP_MLL,1,0,Local,1-0,2024/2025
+12,ESP_OSA,Osasuna,Valladolid,ESP_VALLA,1,0,Local,1-0,2024/2025
+12,ESP_GIR,Girona,Leganes,ESP_LEG,4,3,Local,4-3,2024/2025
+12,ESP_ATM,Ath Madrid,Las Palmas,ESP_PAL,2,0,Local,2-0,2024/2025
+12,ESP_FCB,Barcelona,Espanol,ESP_ESP,3,1,Local,3-1,2024/2025
+12,ESP_SEV,Sevilla,Sociedad,ESP_RSO,0,2,Visitante,0-2,2024/2025
+12,ESP_ATH,Ath Bilbao,Betis,ESP_BET,1,1,Empate,1-1,2024/2025
+12,ESP_CEL,Celta,Getafe,ESP_GET,1,0,Local,1-0,2024/2025
+12,ESP_RAY,Vallecano,Las Palmas,ESP_PAL,1,3,Visitante,1-3,2024/2025
+12,ESP_RMA,Real Madrid,Osasuna,ESP_OSA,4,0,Local,4-0,2024/2025
+13,ESP_VIL,Villarreal,Alaves,ESP_ALA,3,0,Local,3-0,2024/2025
+13,ESP_LEG,Leganes,Sevilla,ESP_SEV,1,0,Local,1-0,2024/2025
+13,ESP_BET,Betis,Celta,ESP_CEL,2,2,Empate,2-2,2024/2025
+13,ESP_MLL,Mallorca,Ath Madrid,ESP_ATM,0,1,Visitante,0-1,2024/2025
+13,ESP_GET,Getafe,Girona,ESP_GIR,0,1,Visitante,0-1,2024/2025
+13,ESP_VALLA,Valladolid,Ath Bilbao,ESP_ATH,1,1,Empate,1-1,2024/2025
+13,ESP_RSO,Sociedad,Barcelona,ESP_FCB,1,0,Local,1-0,2024/2025
+13,ESP_GET,Getafe,Valladolid,ESP_VALLA,2,0,Local,2-0,2024/2025
+13,ESP_VAL,Valencia,Betis,ESP_BET,4,2,Local,4-2,2024/2025
+13,ESP_ATM,Ath Madrid,Alaves,ESP_ALA,2,1,Local,2-1,2024/2025
+14,ESP_GIR,Girona,Espanol,ESP_ESP,4,1,Local,4-1,2024/2025
+14,ESP_PAL,Las Palmas,Mallorca,ESP_MLL,2,3,Visitante,2-3,2024/2025
+14,ESP_CEL,Celta,Barcelona,ESP_FCB,2,2,Empate,2-2,2024/2025
+14,ESP_OSA,Osasuna,Villarreal,ESP_VIL,2,2,Empate,2-2,2024/2025
+14,ESP_SEV,Sevilla,Vallecano,ESP_RAY,1,0,Local,1-0,2024/2025
+14,ESP_LEG,Leganes,Real Madrid,ESP_RMA,0,3,Visitante,0-3,2024/2025
+14,ESP_ATH,Ath Bilbao,Sociedad,ESP_RSO,1,0,Local,1-0,2024/2025
+14,ESP_MLL,Mallorca,Valencia,ESP_VAL,2,1,Local,2-1,2024/2025
+14,ESP_FCB,Barcelona,Las Palmas,ESP_PAL,1,2,Visitante,1-2,2024/2025
+14,ESP_ALA,Alaves,Leganes,ESP_LEG,1,1,Empate,1-1,2024/2025
+15,ESP_ESP,Espanol,Celta,ESP_CEL,3,1,Local,3-1,2024/2025
+15,ESP_VALLA,Valladolid,Ath Madrid,ESP_ATM,0,5,Visitante,0-5,2024/2025
+15,ESP_VIL,Villarreal,Girona,ESP_GIR,2,2,Empate,2-2,2024/2025
+15,ESP_RMA,Real Madrid,Getafe,ESP_GET,2,0,Local,2-0,2024/2025
+15,ESP_RAY,Vallecano,Ath Bilbao,ESP_ATH,1,2,Visitante,1-2,2024/2025
+15,ESP_RSO,Sociedad,Betis,ESP_BET,2,0,Local,2-0,2024/2025
+15,ESP_SEV,Sevilla,Osasuna,ESP_OSA,1,1,Empate,1-1,2024/2025
+15,ESP_MLL,Mallorca,Barcelona,ESP_FCB,1,5,Visitante,1-5,2024/2025
+15,ESP_ATH,Ath Bilbao,Real Madrid,ESP_RMA,2,1,Local,2-1,2024/2025
+15,ESP_CEL,Celta,Mallorca,ESP_MLL,2,0,Local,2-0,2024/2025
+16,ESP_PAL,Las Palmas,Valladolid,ESP_VALLA,2,1,Local,2-1,2024/2025
+16,ESP_BET,Betis,Barcelona,ESP_FCB,2,2,Empate,2-2,2024/2025
+16,ESP_VAL,Valencia,Vallecano,ESP_RAY,0,1,Visitante,0-1,2024/2025
+16,ESP_GIR,Girona,Real Madrid,ESP_RMA,0,3,Visitante,0-3,2024/2025
+16,ESP_LEG,Leganes,Sociedad,ESP_RSO,0,3,Visitante,0-3,2024/2025
+16,ESP_ATH,Ath Bilbao,Villarreal,ESP_VIL,2,0,Local,2-0,2024/2025
+16,ESP_OSA,Osasuna,Alaves,ESP_ALA,2,2,Empate,2-2,2024/2025
+16,ESP_ATM,Ath Madrid,Sevilla,ESP_SEV,4,3,Local,4-3,2024/2025
+16,ESP_GET,Getafe,Espanol,ESP_ESP,1,0,Local,1-0,2024/2025
+16,ESP_VALLA,Valladolid,Valencia,ESP_VAL,1,0,Local,1-0,2024/2025
+17,ESP_ESP,Espanol,Osasuna,ESP_OSA,0,0,Empate,0-0,2024/2025
+17,ESP_MLL,Mallorca,Girona,ESP_GIR,2,1,Local,2-1,2024/2025
+17,ESP_SEV,Sevilla,Celta,ESP_CEL,1,0,Local,1-0,2024/2025
+17,ESP_RAY,Vallecano,Real Madrid,ESP_RMA,3,3,Empate,3-3,2024/2025
+17,ESP_ATM,Ath Madrid,Getafe,ESP_GET,1,0,Local,1-0,2024/2025
+17,ESP_ALA,Alaves,Ath Bilbao,ESP_ATH,1,1,Empate,1-1,2024/2025
+17,ESP_RSO,Sociedad,Las Palmas,ESP_PAL,0,0,Empate,0-0,2024/2025
+17,ESP_VIL,Villarreal,Betis,ESP_BET,1,2,Visitante,1-2,2024/2025
+17,ESP_FCB,Barcelona,Leganes,ESP_LEG,0,1,Visitante,0-1,2024/2025
+17,ESP_ESP,Espanol,Valencia,ESP_VAL,1,1,Empate,1-1,2024/2025
+18,ESP_VIL,Villarreal,Vallecano,ESP_RAY,1,1,Empate,1-1,2024/2025
+18,ESP_GIR,Girona,Valladolid,ESP_VALLA,3,0,Local,3-0,2024/2025
+18,ESP_GET,Getafe,Mallorca,ESP_MLL,0,1,Visitante,0-1,2024/2025
+18,ESP_CEL,Celta,Sociedad,ESP_RSO,2,0,Local,2-0,2024/2025
+18,ESP_OSA,Osasuna,Ath Bilbao,ESP_ATH,1,2,Visitante,1-2,2024/2025
+18,ESP_FCB,Barcelona,Ath Madrid,ESP_ATM,1,2,Visitante,1-2,2024/2025
+18,ESP_VAL,Valencia,Alaves,ESP_ALA,2,2,Empate,2-2,2024/2025
+18,ESP_RMA,Real Madrid,Sevilla,ESP_SEV,4,2,Local,4-2,2024/2025
+18,ESP_PAL,Las Palmas,Espanol,ESP_ESP,1,0,Local,1-0,2024/2025
+18,ESP_LEG,Leganes,Villarreal,ESP_VIL,2,5,Visitante,2-5,2024/2025
+19,ESP_BET,Betis,Vallecano,ESP_RAY,1,1,Empate,1-1,2024/2025
+19,ESP_VAL,Valencia,Real Madrid,ESP_RMA,1,2,Visitante,1-2,2024/2025
+19,ESP_RAY,Vallecano,Celta,ESP_CEL,2,1,Local,2-1,2024/2025
+19,ESP_ALA,Alaves,Girona,ESP_GIR,0,1,Visitante,0-1,2024/2025
+19,ESP_VALLA,Valladolid,Betis,ESP_BET,1,0,Local,1-0,2024/2025
+19,ESP_ESP,Espanol,Leganes,ESP_LEG,1,1,Empate,1-1,2024/2025
+19,ESP_SEV,Sevilla,Valencia,ESP_VAL,1,1,Empate,1-1,2024/2025
+19,ESP_PAL,Las Palmas,Getafe,ESP_GET,1,2,Visitante,1-2,2024/2025
+19,ESP_ATM,Ath Madrid,Osasuna,ESP_OSA,1,0,Local,1-0,2024/2025
+19,ESP_RSO,Sociedad,Villarreal,ESP_VIL,1,0,Local,1-0,2024/2025
+20,ESP_ESP,Espanol,Valladolid,ESP_VALLA,2,1,Local,2-1,2024/2025
+20,ESP_GIR,Girona,Sevilla,ESP_SEV,1,2,Visitante,1-2,2024/2025
+20,ESP_LEG,Leganes,Ath Madrid,ESP_ATM,1,0,Local,1-0,2024/2025
+20,ESP_BET,Betis,Alaves,ESP_ALA,1,3,Visitante,1-3,2024/2025
+20,ESP_GET,Getafe,Barcelona,ESP_FCB,1,1,Empate,1-1,2024/2025
+20,ESP_CEL,Celta,Ath Bilbao,ESP_ATH,1,2,Visitante,1-2,2024/2025
+20,ESP_RMA,Real Madrid,Las Palmas,ESP_PAL,4,1,Local,4-1,2024/2025
+20,ESP_OSA,Osasuna,Vallecano,ESP_RAY,1,1,Empate,1-1,2024/2025
+20,ESP_VAL,Valencia,Sociedad,ESP_RSO,1,0,Local,1-0,2024/2025
+20,ESP_VIL,Villarreal,Mallorca,ESP_MLL,4,0,Local,4-0,2024/2025
+21,ESP_PAL,Las Palmas,Osasuna,ESP_OSA,1,1,Empate,1-1,2024/2025
+21,ESP_MLL,Mallorca,Betis,ESP_BET,0,1,Visitante,0-1,2024/2025
+21,ESP_ATM,Ath Madrid,Villarreal,ESP_VIL,1,1,Empate,1-1,2024/2025
+21,ESP_SEV,Sevilla,Espanol,ESP_ESP,1,1,Empate,1-1,2024/2025
+21,ESP_VALLA,Valladolid,Real Madrid,ESP_RMA,0,3,Visitante,0-3,2024/2025
+21,ESP_RAY,Vallecano,Girona,ESP_GIR,2,1,Local,2-1,2024/2025
+21,ESP_RSO,Sociedad,Getafe,ESP_GET,0,3,Visitante,0-3,2024/2025
+21,ESP_ATH,Ath Bilbao,Leganes,ESP_LEG,0,0,Empate,0-0,2024/2025
+21,ESP_FCB,Barcelona,Valencia,ESP_VAL,7,1,Local,7-1,2024/2025
+21,ESP_ALA,Alaves,Celta,ESP_CEL,1,1,Empate,1-1,2024/2025
+22,ESP_LEG,Leganes,Vallecano,ESP_RAY,0,1,Visitante,0-1,2024/2025
+22,ESP_GET,Getafe,Sevilla,ESP_SEV,0,0,Empate,0-0,2024/2025
+22,ESP_VIL,Villarreal,Valladolid,ESP_VALLA,5,1,Local,5-1,2024/2025
+22,ESP_ATM,Ath Madrid,Mallorca,ESP_MLL,2,0,Local,2-0,2024/2025
+22,ESP_ESP,Espanol,Real Madrid,ESP_RMA,1,0,Local,1-0,2024/2025
+22,ESP_FCB,Barcelona,Alaves,ESP_ALA,1,0,Local,1-0,2024/2025
+22,ESP_VAL,Valencia,Celta,ESP_CEL,2,1,Local,2-1,2024/2025
+22,ESP_OSA,Osasuna,Sociedad,ESP_RSO,2,1,Local,2-1,2024/2025
+22,ESP_BET,Betis,Ath Bilbao,ESP_ATH,2,2,Empate,2-2,2024/2025
+22,ESP_GIR,Girona,Las Palmas,ESP_PAL,2,1,Local,2-1,2024/2025
+23,ESP_RAY,Vallecano,Valladolid,ESP_VALLA,1,0,Local,1-0,2024/2025
+23,ESP_CEL,Celta,Betis,ESP_BET,3,2,Local,3-2,2024/2025
+23,ESP_ATH,Ath Bilbao,Girona,ESP_GIR,3,0,Local,3-0,2024/2025
+23,ESP_PAL,Las Palmas,Villarreal,ESP_VIL,1,2,Visitante,1-2,2024/2025
+23,ESP_RMA,Real Madrid,Ath Madrid,ESP_ATM,1,1,Empate,1-1,2024/2025
+23,ESP_ALA,Alaves,Getafe,ESP_GET,0,1,Visitante,0-1,2024/2025
+23,ESP_VAL,Valencia,Leganes,ESP_LEG,2,0,Local,2-0,2024/2025
+23,ESP_RSO,Sociedad,Espanol,ESP_ESP,2,1,Local,2-1,2024/2025
+23,ESP_SEV,Sevilla,Barcelona,ESP_FCB,1,4,Visitante,1-4,2024/2025
+23,ESP_MLL,Mallorca,Osasuna,ESP_OSA,1,1,Empate,1-1,2024/2025
+24,ESP_GIR,Girona,Getafe,ESP_GET,1,2,Visitante,1-2,2024/2025
+24,ESP_LEG,Leganes,Alaves,ESP_ALA,3,3,Empate,3-3,2024/2025
+24,ESP_OSA,Osasuna,Real Madrid,ESP_RMA,1,1,Empate,1-1,2024/2025
+24,ESP_ATM,Ath Madrid,Celta,ESP_CEL,1,1,Empate,1-1,2024/2025
+24,ESP_VIL,Villarreal,Valencia,ESP_VAL,1,1,Empate,1-1,2024/2025
+24,ESP_ESP,Espanol,Ath Bilbao,ESP_ATH,1,1,Empate,1-1,2024/2025
+24,ESP_VALLA,Valladolid,Sevilla,ESP_SEV,0,4,Visitante,0-4,2024/2025
+24,ESP_MLL,Mallorca,Las Palmas,ESP_PAL,3,1,Local,3-1,2024/2025
+24,ESP_BET,Betis,Sociedad,ESP_RSO,3,0,Local,3-0,2024/2025
+24,ESP_FCB,Barcelona,Vallecano,ESP_RAY,1,0,Local,1-0,2024/2025
+25,ESP_CEL,Celta,Osasuna,ESP_OSA,1,0,Local,1-0,2024/2025
+25,ESP_ALA,Alaves,Espanol,ESP_ESP,0,1,Visitante,0-1,2024/2025
+25,ESP_RAY,Vallecano,Villarreal,ESP_VIL,0,1,Visitante,0-1,2024/2025
+25,ESP_VAL,Valencia,Ath Madrid,ESP_ATM,0,3,Visitante,0-3,2024/2025
+25,ESP_PAL,Las Palmas,Barcelona,ESP_FCB,0,2,Visitante,0-2,2024/2025
+25,ESP_ATH,Ath Bilbao,Valladolid,ESP_VALLA,7,1,Local,7-1,2024/2025
+25,ESP_RMA,Real Madrid,Girona,ESP_GIR,2,0,Local,2-0,2024/2025
+25,ESP_GET,Getafe,Betis,ESP_BET,1,2,Visitante,1-2,2024/2025
+25,ESP_RSO,Sociedad,Leganes,ESP_LEG,3,0,Local,3-0,2024/2025
+25,ESP_SEV,Sevilla,Mallorca,ESP_MLL,1,1,Empate,1-1,2024/2025
+26,ESP_VALLA,Valladolid,Las Palmas,ESP_PAL,1,1,Empate,1-1,2024/2025
+26,ESP_GIR,Girona,Celta,ESP_CEL,2,2,Empate,2-2,2024/2025
+26,ESP_RAY,Vallecano,Sevilla,ESP_SEV,1,1,Empate,1-1,2024/2025
+26,ESP_BET,Betis,Real Madrid,ESP_RMA,2,1,Local,2-1,2024/2025
+26,ESP_ATM,Ath Madrid,Ath Bilbao,ESP_ATH,1,0,Local,1-0,2024/2025
+26,ESP_LEG,Leganes,Getafe,ESP_GET,1,0,Local,1-0,2024/2025
+26,ESP_FCB,Barcelona,Sociedad,ESP_RSO,4,0,Local,4-0,2024/2025
+26,ESP_MLL,Mallorca,Alaves,ESP_ALA,1,1,Empate,1-1,2024/2025
+26,ESP_OSA,Osasuna,Valencia,ESP_VAL,3,3,Empate,3-3,2024/2025
+26,ESP_CEL,Celta,Leganes,ESP_LEG,2,1,Local,2-1,2024/2025
+27,ESP_ALA,Alaves,Villarreal,ESP_VIL,1,0,Local,1-0,2024/2025
+27,ESP_VAL,Valencia,Valladolid,ESP_VALLA,2,1,Local,2-1,2024/2025
+27,ESP_GET,Getafe,Ath Madrid,ESP_ATM,2,1,Local,2-1,2024/2025
+27,ESP_RMA,Real Madrid,Vallecano,ESP_RAY,2,1,Local,2-1,2024/2025
+27,ESP_ATH,Ath Bilbao,Mallorca,ESP_MLL,1,1,Empate,1-1,2024/2025
+27,ESP_BET,Betis,Las Palmas,ESP_PAL,1,0,Local,1-0,2024/2025
+27,ESP_RSO,Sociedad,Sevilla,ESP_SEV,0,1,Visitante,0-1,2024/2025
+27,ESP_ESP,Espanol,Girona,ESP_GIR,1,1,Empate,1-1,2024/2025
+27,ESP_PAL,Las Palmas,Alaves,ESP_ALA,2,2,Empate,2-2,2024/2025
+27,ESP_VALLA,Valladolid,Celta,ESP_CEL,0,1,Visitante,0-1,2024/2025
+28,ESP_MLL,Mallorca,Espanol,ESP_ESP,2,1,Local,2-1,2024/2025
+28,ESP_VIL,Villarreal,Real Madrid,ESP_RMA,1,2,Visitante,1-2,2024/2025
+28,ESP_GIR,Girona,Valencia,ESP_VAL,1,1,Empate,1-1,2024/2025
+28,ESP_LEG,Leganes,Betis,ESP_BET,2,3,Visitante,2-3,2024/2025
+28,ESP_SEV,Sevilla,Ath Bilbao,ESP_ATH,0,1,Visitante,0-1,2024/2025
+28,ESP_OSA,Osasuna,Getafe,ESP_GET,1,2,Visitante,1-2,2024/2025
+28,ESP_RAY,Vallecano,Sociedad,ESP_RSO,2,2,Empate,2-2,2024/2025
+28,ESP_ATM,Ath Madrid,Barcelona,ESP_FCB,2,4,Visitante,2-4,2024/2025
+28,ESP_FCB,Barcelona,Osasuna,ESP_OSA,3,0,Local,3-0,2024/2025
+28,ESP_RSO,Sociedad,Valladolid,ESP_VALLA,2,1,Local,2-1,2024/2025
+29,ESP_ESP,Espanol,Ath Madrid,ESP_ATM,1,1,Empate,1-1,2024/2025
+29,ESP_ALA,Alaves,Vallecano,ESP_RAY,0,2,Visitante,0-2,2024/2025
+29,ESP_RMA,Real Madrid,Leganes,ESP_LEG,3,2,Local,3-2,2024/2025
+29,ESP_GET,Getafe,Villarreal,ESP_VIL,1,2,Visitante,1-2,2024/2025
+29,ESP_FCB,Barcelona,Girona,ESP_GIR,4,1,Local,4-1,2024/2025
+29,ESP_ATH,Ath Bilbao,Osasuna,ESP_OSA,0,0,Empate,0-0,2024/2025
+29,ESP_VAL,Valencia,Mallorca,ESP_MLL,1,0,Local,1-0,2024/2025
+29,ESP_BET,Betis,Sevilla,ESP_SEV,2,1,Local,2-1,2024/2025
+29,ESP_CEL,Celta,Las Palmas,ESP_PAL,1,1,Empate,1-1,2024/2025
+29,ESP_RAY,Vallecano,Espanol,ESP_ESP,0,4,Visitante,0-4,2024/2025
+30,ESP_GIR,Girona,Alaves,ESP_ALA,0,1,Visitante,0-1,2024/2025
+30,ESP_RMA,Real Madrid,Valencia,ESP_VAL,1,2,Visitante,1-2,2024/2025
+30,ESP_MLL,Mallorca,Celta,ESP_CEL,1,2,Visitante,1-2,2024/2025
+30,ESP_FCB,Barcelona,Betis,ESP_BET,1,1,Empate,1-1,2024/2025
+30,ESP_PAL,Las Palmas,Sociedad,ESP_RSO,1,3,Visitante,1-3,2024/2025
+30,ESP_SEV,Sevilla,Ath Madrid,ESP_ATM,1,2,Visitante,1-2,2024/2025
+30,ESP_VALLA,Valladolid,Getafe,ESP_GET,0,4,Visitante,0-4,2024/2025
+30,ESP_VIL,Villarreal,Ath Bilbao,ESP_ATH,0,0,Empate,0-0,2024/2025
+30,ESP_LEG,Leganes,Osasuna,ESP_OSA,1,1,Empate,1-1,2024/2025
+30,ESP_VAL,Valencia,Sevilla,ESP_SEV,1,0,Local,1-0,2024/2025
+31,ESP_RSO,Sociedad,Mallorca,ESP_MLL,0,2,Visitante,0-2,2024/2025
+31,ESP_GET,Getafe,Las Palmas,ESP_PAL,1,3,Visitante,1-3,2024/2025
+31,ESP_CEL,Celta,Espanol,ESP_ESP,0,2,Visitante,0-2,2024/2025
+31,ESP_LEG,Leganes,Barcelona,ESP_FCB,0,1,Visitante,0-1,2024/2025
+31,ESP_OSA,Osasuna,Girona,ESP_GIR,2,1,Local,2-1,2024/2025
+31,ESP_ALA,Alaves,Real Madrid,ESP_RMA,0,1,Visitante,0-1,2024/2025
+31,ESP_BET,Betis,Villarreal,ESP_VIL,1,2,Visitante,1-2,2024/2025
+31,ESP_ATH,Ath Bilbao,Vallecano,ESP_RAY,3,1,Local,3-1,2024/2025
+31,ESP_ATM,Ath Madrid,Valladolid,ESP_VALLA,4,2,Local,4-2,2024/2025
+31,ESP_ESP,Espanol,Getafe,ESP_GET,1,0,Local,1-0,2024/2025
+32,ESP_RAY,Vallecano,Valencia,ESP_VAL,1,1,Empate,1-1,2024/2025
+32,ESP_FCB,Barcelona,Celta,ESP_CEL,4,3,Local,4-3,2024/2025
+32,ESP_MLL,Mallorca,Leganes,ESP_LEG,0,0,Empate,0-0,2024/2025
+32,ESP_PAL,Las Palmas,Ath Madrid,ESP_ATM,1,0,Local,1-0,2024/2025
+32,ESP_VALLA,Valladolid,Osasuna,ESP_OSA,2,3,Visitante,2-3,2024/2025
+32,ESP_VIL,Villarreal,Sociedad,ESP_RSO,2,2,Empate,2-2,2024/2025
+32,ESP_SEV,Sevilla,Alaves,ESP_ALA,1,1,Empate,1-1,2024/2025
+32,ESP_RMA,Real Madrid,Ath Bilbao,ESP_ATH,1,0,Local,1-0,2024/2025
+32,ESP_GIR,Girona,Betis,ESP_BET,1,3,Visitante,1-3,2024/2025
+32,ESP_VAL,Valencia,Espanol,ESP_ESP,1,1,Empate,1-1,2024/2025
+33,ESP_FCB,Barcelona,Mallorca,ESP_MLL,1,0,Local,1-0,2024/2025
+33,ESP_ATH,Ath Bilbao,Las Palmas,ESP_PAL,1,0,Local,1-0,2024/2025
+33,ESP_CEL,Celta,Villarreal,ESP_VIL,3,0,Local,3-0,2024/2025
+33,ESP_ALA,Alaves,Sociedad,ESP_RSO,1,0,Local,1-0,2024/2025
+33,ESP_GET,Getafe,Real Madrid,ESP_RMA,0,1,Visitante,0-1,2024/2025
+33,ESP_LEG,Leganes,Girona,ESP_GIR,1,1,Empate,1-1,2024/2025
+33,ESP_OSA,Osasuna,Sevilla,ESP_SEV,1,0,Local,1-0,2024/2025
+33,ESP_ATM,Ath Madrid,Vallecano,ESP_RAY,3,0,Local,3-0,2024/2025
+33,ESP_BET,Betis,Valladolid,ESP_VALLA,5,1,Local,5-1,2024/2025
+33,ESP_VIL,Villarreal,Espanol,ESP_ESP,1,0,Local,1-0,2024/2025
+34,ESP_RAY,Vallecano,Getafe,ESP_GET,1,0,Local,1-0,2024/2025
+34,ESP_ALA,Alaves,Ath Madrid,ESP_ATM,0,0,Empate,0-0,2024/2025
+34,ESP_VIL,Villarreal,Osasuna,ESP_OSA,4,2,Local,4-2,2024/2025
+34,ESP_PAL,Las Palmas,Valencia,ESP_VAL,2,3,Visitante,2-3,2024/2025
+34,ESP_VALLA,Valladolid,Barcelona,ESP_FCB,1,2,Visitante,1-2,2024/2025
+34,ESP_RMA,Real Madrid,Celta,ESP_CEL,3,2,Local,3-2,2024/2025
+34,ESP_SEV,Sevilla,Leganes,ESP_LEG,2,2,Empate,2-2,2024/2025
+34,ESP_ESP,Espanol,Betis,ESP_BET,1,2,Visitante,1-2,2024/2025
+34,ESP_RSO,Sociedad,Ath Bilbao,ESP_ATH,0,0,Empate,0-0,2024/2025
+34,ESP_GIR,Girona,Mallorca,ESP_MLL,1,0,Local,1-0,2024/2025
+35,ESP_PAL,Las Palmas,Vallecano,ESP_RAY,0,1,Visitante,0-1,2024/2025
+35,ESP_VAL,Valencia,Getafe,ESP_GET,3,0,Local,3-0,2024/2025
+35,ESP_CEL,Celta,Sevilla,ESP_SEV,3,2,Local,3-2,2024/2025
+35,ESP_GIR,Girona,Villarreal,ESP_VIL,0,1,Visitante,0-1,2024/2025
+35,ESP_MLL,Mallorca,Valladolid,ESP_VALLA,2,1,Local,2-1,2024/2025
+35,ESP_ATM,Ath Madrid,Sociedad,ESP_RSO,4,0,Local,4-0,2024/2025
+35,ESP_LEG,Leganes,Espanol,ESP_ESP,3,2,Local,3-2,2024/2025
+35,ESP_FCB,Barcelona,Real Madrid,ESP_RMA,4,3,Local,4-3,2024/2025
+35,ESP_ATH,Ath Bilbao,Alaves,ESP_ALA,1,0,Local,1-0,2024/2025
+35,ESP_BET,Betis,Osasuna,ESP_OSA,1,1,Empate,1-1,2024/2025
+36,ESP_VALLA,Valladolid,Girona,ESP_GIR,0,1,Visitante,0-1,2024/2025
+36,ESP_RSO,Sociedad,Celta,ESP_CEL,0,1,Visitante,0-1,2024/2025
+36,ESP_SEV,Sevilla,Las Palmas,ESP_PAL,1,0,Local,1-0,2024/2025
+36,ESP_ALA,Alaves,Valencia,ESP_VAL,1,0,Local,1-0,2024/2025
+36,ESP_VIL,Villarreal,Leganes,ESP_LEG,3,0,Local,3-0,2024/2025
+36,ESP_RMA,Real Madrid,Mallorca,ESP_MLL,2,1,Local,2-1,2024/2025
+36,ESP_RAY,Vallecano,Betis,ESP_BET,2,2,Empate,2-2,2024/2025
+36,ESP_OSA,Osasuna,Ath Madrid,ESP_ATM,2,0,Local,2-0,2024/2025
+36,ESP_ESP,Espanol,Barcelona,ESP_FCB,0,2,Visitante,0-2,2024/2025
+36,ESP_GET,Getafe,Ath Bilbao,ESP_ATH,0,2,Visitante,0-2,2024/2025
+37,ESP_ATM,Ath Madrid,Betis,ESP_BET,4,1,Local,4-1,2024/2025
+37,ESP_FCB,Barcelona,Villarreal,ESP_VIL,2,3,Visitante,2-3,2024/2025
+37,ESP_CEL,Celta,Vallecano,ESP_RAY,1,2,Visitante,1-2,2024/2025
+37,ESP_PAL,Las Palmas,Leganes,ESP_LEG,0,1,Visitante,0-1,2024/2025
+37,ESP_MLL,Mallorca,Getafe,ESP_GET,1,2,Visitante,1-2,2024/2025
+37,ESP_OSA,Osasuna,Espanol,ESP_ESP,2,0,Local,2-0,2024/2025
+37,ESP_SEV,Sevilla,Real Madrid,ESP_RMA,0,2,Visitante,0-2,2024/2025
+37,ESP_RSO,Sociedad,Girona,ESP_GIR,3,2,Local,3-2,2024/2025
+37,ESP_VAL,Valencia,Ath Bilbao,ESP_ATH,0,1,Visitante,0-1,2024/2025
+37,ESP_VALLA,Valladolid,Alaves,ESP_ALA,0,1,Visitante,0-1,2024/2025
+38,ESP_BET,Betis,Valencia,ESP_VAL,1,1,Empate,1-1,2024/2025
+38,ESP_RMA,Real Madrid,Sociedad,ESP_RSO,2,0,Local,2-0,2024/2025
+38,ESP_ESP,Espanol,Las Palmas,ESP_PAL,2,0,Local,2-0,2024/2025
+38,ESP_LEG,Leganes,Valladolid,ESP_VALLA,3,0,Local,3-0,2024/2025
+38,ESP_ALA,Alaves,Osasuna,ESP_OSA,1,1,Empate,1-1,2024/2025
+38,ESP_GET,Getafe,Celta,ESP_CEL,1,2,Visitante,1-2,2024/2025
+38,ESP_RAY,Vallecano,Mallorca,ESP_MLL,0,0,Empate,0-0,2024/2025
+38,ESP_GIR,Girona,Ath Madrid,ESP_ATM,0,4,Visitante,0-4,2024/2025
+38,ESP_VIL,Villarreal,Sevilla,ESP_SEV,4,2,Local,4-2,2024/2025
+38,ESP_ATH,Ath Bilbao,Barcelona,ESP_FCB,0,3,Visitante,0-3,2024/2025
+1,ESP_ATM,Atl. Madrid,Granada CF,ESP_GRA,3,1,Local,3-1,2023/2024
+1,ESP_CAD,Cadiz CF,Alaves,ESP_ALA,1,0,Local,1-0,2023/2024
+1,ESP_GET,Getafe,Barcelona,ESP_FCB,0,0,Empate,0-0,2023/2024
+1,ESP_VIL,Villarreal,Betis,ESP_BET,1,2,Visitante,1-2,2023/2024
+1,ESP_CEL,Celta Vigo,Osasuna,ESP_OSA,0,2,Visitante,0-2,2023/2024
+1,ESP_ATH,Ath Bilbao,Real Madrid,ESP_RMA,0,2,Visitante,0-2,2023/2024
+1,ESP_PAL,Las Palmas,Mallorca,ESP_MLL,1,1,Empate,1-1,2023/2024
+1,ESP_RSO,Real Sociedad,Girona,ESP_GIR,1,1,Empate,1-1,2023/2024
+1,ESP_SEV,Sevilla,Valencia,ESP_VAL,1,2,Visitante,1-2,2023/2024
+1,ESP_ALM,Almeria,Rayo Vallecano,ESP_RAY,0,2,Visitante,0-2,2023/2024
+2,ESP_GRA,Granada CF,Rayo Vallecano,ESP_RAY,0,2,Visitante,0-2,2023/2024
+2,ESP_ALA,Alaves,Sevilla,ESP_SEV,4,3,Local,4-3,2023/2024
+2,ESP_BET,Betis,Atl. Madrid,ESP_ATM,0,0,Empate,0-0,2023/2024
+2,ESP_FCB,Barcelona,Cadiz CF,ESP_CAD,2,0,Local,2-0,2023/2024
+2,ESP_GIR,Girona,Getafe,ESP_GET,3,0,Local,3-0,2023/2024
+2,ESP_OSA,Osasuna,Ath Bilbao,ESP_ATH,0,2,Visitante,0-2,2023/2024
+2,ESP_ALM,Almeria,Real Madrid,ESP_RMA,1,3,Visitante,1-3,2023/2024
+2,ESP_RSO,Real Sociedad,Celta Vigo,ESP_CEL,1,1,Empate,1-1,2023/2024
+2,ESP_VAL,Valencia,Las Palmas,ESP_PAL,1,0,Local,1-0,2023/2024
+2,ESP_MLL,Mallorca,Villarreal,ESP_VIL,0,1,Visitante,0-1,2023/2024
+3,ESP_RAY,Rayo Vallecano,Atl. Madrid,ESP_ATM,0,7,Visitante,0-7,2023/2024
+3,ESP_GET,Getafe,Alaves,ESP_ALA,1,0,Local,1-0,2023/2024
+3,ESP_ATH,Ath Bilbao,Betis,ESP_BET,4,2,Local,4-2,2023/2024
+3,ESP_VAL,Valencia,Osasuna,ESP_OSA,1,2,Visitante,1-2,2023/2024
+3,ESP_VIL,Villarreal,Barcelona,ESP_FCB,3,4,Visitante,3-4,2023/2024
+3,ESP_SEV,Sevilla,Girona,ESP_GIR,1,2,Visitante,1-2,2023/2024
+3,ESP_GRA,Granada CF,Mallorca,ESP_MLL,3,2,Local,3-2,2023/2024
+3,ESP_CAD,Cadiz CF,Almeria,ESP_ALM,1,1,Empate,1-1,2023/2024
+3,ESP_CEL,Celta Vigo,Real Madrid,ESP_RMA,0,1,Visitante,0-1,2023/2024
+3,ESP_PAL,Las Palmas,Real Sociedad,ESP_RSO,0,0,Empate,0-0,2023/2024
+4,ESP_ATM,Atl. Madrid,Sevilla,ESP_SEV,1,0,Local,1-0,2023/2024
+4,ESP_OSA,Osasuna,Barcelona,ESP_FCB,1,2,Visitante,1-2,2023/2024
+4,ESP_MLL,Mallorca,Ath Bilbao,ESP_ATH,0,0,Empate,0-0,2023/2024
+4,ESP_GIR,Girona,Las Palmas,ESP_PAL,1,0,Local,1-0,2023/2024
+4,ESP_BET,Betis,Rayo Vallecano,ESP_RAY,1,0,Local,1-0,2023/2024
+4,ESP_ALA,Alaves,Valencia,ESP_VAL,1,0,Local,1-0,2023/2024
+4,ESP_RMA,Real Madrid,Getafe,ESP_GET,2,1,Local,2-1,2023/2024
+4,ESP_RSO,Real Sociedad,Granada CF,ESP_GRA,5,3,Local,5-3,2023/2024
+4,ESP_ALM,Almeria,Celta Vigo,ESP_CEL,2,3,Visitante,2-3,2023/2024
+4,ESP_CAD,Cadiz CF,Villarreal,ESP_VIL,3,1,Local,3-1,2023/2024
+5,ESP_GRA,Granada CF,Girona,ESP_GIR,2,4,Visitante,2-4,2023/2024
+5,ESP_RMA,Real Madrid,Real Sociedad,ESP_RSO,2,1,Local,2-1,2023/2024
+5,ESP_SEV,Sevilla,Las Palmas,ESP_PAL,1,0,Local,1-0,2023/2024
+5,ESP_VIL,Villarreal,Almeria,ESP_ALM,2,1,Local,2-1,2023/2024
+5,ESP_GET,Getafe,Osasuna,ESP_OSA,3,2,Local,3-2,2023/2024
+5,ESP_FCB,Barcelona,Betis,ESP_BET,5,0,Local,5-0,2023/2024
+5,ESP_CEL,Celta Vigo,Mallorca,ESP_MLL,0,1,Visitante,0-1,2023/2024
+5,ESP_VAL,Valencia,Atl. Madrid,ESP_ATM,3,0,Local,3-0,2023/2024
+5,ESP_ATH,Ath Bilbao,Cadiz CF,ESP_CAD,3,0,Local,3-0,2023/2024
+5,ESP_RAY,Rayo Vallecano,Alaves,ESP_ALA,2,0,Local,2-0,2023/2024
+6,ESP_ATM,Atl. Madrid,Real Madrid,ESP_RMA,3,1,Local,3-1,2023/2024
+6,ESP_BET,Betis,Cadiz CF,ESP_CAD,1,1,Empate,1-1,2023/2024
+6,ESP_PAL,Las Palmas,Granada CF,ESP_GRA,1,0,Local,1-0,2023/2024
+6,ESP_RAY,Rayo Vallecano,Villarreal,ESP_VIL,1,1,Empate,1-1,2023/2024
+6,ESP_RSO,Real Sociedad,Getafe,ESP_GET,4,3,Local,4-3,2023/2024
+6,ESP_ALM,Almeria,Valencia,ESP_VAL,2,2,Empate,2-2,2023/2024
+6,ESP_FCB,Barcelona,Celta Vigo,ESP_CEL,3,2,Local,3-2,2023/2024
+6,ESP_OSA,Osasuna,Sevilla,ESP_SEV,0,0,Empate,0-0,2023/2024
+6,ESP_GIR,Girona,Mallorca,ESP_MLL,5,3,Local,5-3,2023/2024
+6,ESP_ALA,Alaves,Ath Bilbao,ESP_ATH,0,2,Visitante,0-2,2023/2024
+7,ESP_OSA,Osasuna,Atl. Madrid,ESP_ATM,0,2,Visitante,0-2,2023/2024
+7,ESP_CEL,Celta Vigo,Alaves,ESP_ALA,1,1,Empate,1-1,2023/2024
+7,ESP_GRA,Granada CF,Betis,ESP_BET,1,1,Empate,1-1,2023/2024
+7,ESP_CAD,Cadiz CF,Rayo Vallecano,ESP_RAY,0,0,Empate,0-0,2023/2024
+7,ESP_VAL,Valencia,Real Sociedad,ESP_RSO,0,1,Visitante,0-1,2023/2024
+7,ESP_ATH,Ath Bilbao,Getafe,ESP_GET,2,2,Empate,2-2,2023/2024
+7,ESP_RMA,Real Madrid,Las Palmas,ESP_PAL,2,0,Local,2-0,2023/2024
+7,ESP_VIL,Villarreal,Girona,ESP_GIR,1,2,Visitante,1-2,2023/2024
+7,ESP_MLL,Mallorca,Barcelona,ESP_FCB,2,2,Empate,2-2,2023/2024
+7,ESP_SEV,Sevilla,Almeria,ESP_ALM,5,1,Local,5-1,2023/2024
+8,ESP_PAL,Las Palmas,Celta Vigo,ESP_CEL,2,1,Local,2-1,2023/2024
+8,ESP_ATM,Atl. Madrid,Cadiz CF,ESP_CAD,3,2,Local,3-2,2023/2024
+8,ESP_BET,Betis,Valencia,ESP_VAL,3,0,Local,3-0,2023/2024
+8,ESP_ALA,Alaves,Osasuna,ESP_OSA,0,2,Visitante,0-2,2023/2024
+8,ESP_ALM,Almeria,Granada CF,ESP_GRA,3,3,Empate,3-3,2023/2024
+8,ESP_RSO,Real Sociedad,Ath Bilbao,ESP_ATH,3,0,Local,3-0,2023/2024
+8,ESP_GIR,Girona,Real Madrid,ESP_RMA,0,3,Visitante,0-3,2023/2024
+8,ESP_RAY,Rayo Vallecano,Mallorca,ESP_MLL,2,2,Empate,2-2,2023/2024
+8,ESP_GET,Getafe,Villarreal,ESP_VIL,0,0,Empate,0-0,2023/2024
+8,ESP_FCB,Barcelona,Sevilla,ESP_SEV,1,0,Local,1-0,2023/2024
+9,ESP_GRA,Granada CF,Barcelona,ESP_FCB,2,2,Empate,2-2,2023/2024
+9,ESP_ALA,Alaves,Betis,ESP_BET,1,1,Empate,1-1,2023/2024
+9,ESP_CEL,Celta Vigo,Getafe,ESP_GET,2,2,Empate,2-2,2023/2024
+9,ESP_ATM,Atl. Madrid,Real Sociedad,ESP_RSO,2,1,Local,2-1,2023/2024
+9,ESP_VIL,Villarreal,Las Palmas,ESP_PAL,1,2,Visitante,1-2,2023/2024
+9,ESP_SEV,Sevilla,Rayo Vallecano,ESP_RAY,2,2,Empate,2-2,2023/2024
+9,ESP_MLL,Mallorca,Valencia,ESP_VAL,1,1,Empate,1-1,2023/2024
+9,ESP_RMA,Real Madrid,Osasuna,ESP_OSA,4,0,Local,4-0,2023/2024
+9,ESP_CAD,Cadiz CF,Girona,ESP_GIR,0,1,Visitante,0-1,2023/2024
+9,ESP_ATH,Ath Bilbao,Almeria,ESP_ALM,3,0,Local,3-0,2023/2024
+10,ESP_VAL,Valencia,Cadiz CF,ESP_CAD,2,0,Local,2-0,2023/2024
+10,ESP_FCB,Barcelona,Ath Bilbao,ESP_ATH,1,0,Local,1-0,2023/2024
+10,ESP_VIL,Villarreal,Alaves,ESP_ALA,1,1,Empate,1-1,2023/2024
+10,ESP_GIR,Girona,Almeria,ESP_ALM,5,2,Local,5-2,2023/2024
+10,ESP_PAL,Las Palmas,Rayo Vallecano,ESP_RAY,0,1,Visitante,0-1,2023/2024
+10,ESP_CEL,Celta Vigo,Atl. Madrid,ESP_ATM,0,3,Visitante,0-3,2023/2024
+10,ESP_SEV,Sevilla,Real Madrid,ESP_RMA,1,1,Empate,1-1,2023/2024
+10,ESP_GET,Getafe,Betis,ESP_BET,1,1,Empate,1-1,2023/2024
+10,ESP_RSO,Real Sociedad,Mallorca,ESP_MLL,1,0,Local,1-0,2023/2024
+10,ESP_OSA,Osasuna,Granada CF,ESP_GRA,2,0,Local,2-0,2023/2024
+11,ESP_GRA,Granada CF,Villarreal,ESP_VIL,2,3,Visitante,2-3,2023/2024
+11,ESP_ATM,Atl. Madrid,Alaves,ESP_ALA,2,1,Local,2-1,2023/2024
+11,ESP_ATH,Ath Bilbao,Valencia,ESP_VAL,2,2,Empate,2-2,2023/2024
+11,ESP_RAY,Rayo Vallecano,Real Sociedad,ESP_RSO,2,2,Empate,2-2,2023/2024
+11,ESP_BET,Betis,Osasuna,ESP_OSA,2,1,Local,2-1,2023/2024
+11,ESP_CAD,Cadiz CF,Sevilla,ESP_SEV,2,2,Empate,2-2,2023/2024
+11,ESP_MLL,Mallorca,Getafe,ESP_GET,0,0,Empate,0-0,2023/2024
+11,ESP_FCB,Barcelona,Real Madrid,ESP_RMA,1,2,Visitante,1-2,2023/2024
+11,ESP_ALM,Almeria,Las Palmas,ESP_PAL,1,2,Visitante,1-2,2023/2024
+11,ESP_GIR,Girona,Celta Vigo,ESP_CEL,1,0,Local,1-0,2023/2024
+12,ESP_GET,Getafe,Cadiz CF,ESP_CAD,1,0,Local,1-0,2023/2024
+12,ESP_RMA,Real Madrid,Rayo Vallecano,ESP_RAY,0,0,Empate,0-0,2023/2024
+12,ESP_VIL,Villarreal,Ath Bilbao,ESP_ATH,2,3,Visitante,2-3,2023/2024
+12,ESP_VAL,Valencia,Granada CF,ESP_GRA,1,0,Local,1-0,2023/2024
+12,ESP_ALA,Alaves,Almeria,ESP_ALM,1,0,Local,1-0,2023/2024
+12,ESP_RSO,Real Sociedad,Barcelona,ESP_FCB,0,1,Visitante,0-1,2023/2024
+12,ESP_CEL,Celta Vigo,Sevilla,ESP_SEV,1,1,Empate,1-1,2023/2024
+12,ESP_BET,Betis,Mallorca,ESP_MLL,2,0,Local,2-0,2023/2024
+12,ESP_OSA,Osasuna,Girona,ESP_GIR,2,4,Visitante,2-4,2023/2024
+12,ESP_PAL,Las Palmas,Atl. Madrid,ESP_ATM,2,1,Local,2-1,2023/2024
+13,ESP_MLL,Mallorca,Cadiz CF,ESP_CAD,1,1,Empate,1-1,2023/2024
+13,ESP_ATM,Atl. Madrid,Villarreal,ESP_VIL,3,1,Local,3-1,2023/2024
+13,ESP_SEV,Sevilla,Betis,ESP_BET,1,1,Empate,1-1,2023/2024
+13,ESP_FCB,Barcelona,Alaves,ESP_ALA,2,1,Local,2-1,2023/2024
+13,ESP_RMA,Real Madrid,Valencia,ESP_VAL,5,1,Local,5-1,2023/2024
+13,ESP_GRA,Granada CF,Getafe,ESP_GET,1,1,Empate,1-1,2023/2024
+13,ESP_OSA,Osasuna,Las Palmas,ESP_PAL,1,1,Empate,1-1,2023/2024
+13,ESP_ALM,Almeria,Real Sociedad,ESP_RSO,1,3,Visitante,1-3,2023/2024
+13,ESP_RAY,Rayo Vallecano,Girona,ESP_GIR,1,2,Visitante,1-2,2023/2024
+13,ESP_ATH,Ath Bilbao,Celta Vigo,ESP_CEL,4,3,Local,4-3,2023/2024
+14,ESP_GIR,Girona,Ath Bilbao,ESP_ATH,1,1,Empate,1-1,2023/2024
+14,ESP_BET,Betis,Las Palmas,ESP_PAL,1,0,Local,1-0,2023/2024
+14,ESP_CAD,Cadiz CF,Real Madrid,ESP_RMA,0,3,Visitante,0-3,2023/2024
+14,ESP_RSO,Real Sociedad,Sevilla,ESP_SEV,2,1,Local,2-1,2023/2024
+14,ESP_VIL,Villarreal,Osasuna,ESP_OSA,3,1,Local,3-1,2023/2024
+14,ESP_ATM,Atl. Madrid,Mallorca,ESP_MLL,1,0,Local,1-0,2023/2024
+14,ESP_GET,Getafe,Almeria,ESP_ALM,2,1,Local,2-1,2023/2024
+14,ESP_VAL,Valencia,Celta Vigo,ESP_CEL,0,0,Empate,0-0,2023/2024
+14,ESP_RAY,Rayo Vallecano,Barcelona,ESP_FCB,1,1,Empate,1-1,2023/2024
+14,ESP_ALA,Alaves,Granada CF,ESP_GRA,3,1,Local,3-1,2023/2024
+15,ESP_CEL,Celta Vigo,Cadiz CF,ESP_CAD,1,1,Empate,1-1,2023/2024
+15,ESP_FCB,Barcelona,Atl. Madrid,ESP_ATM,1,0,Local,1-0,2023/2024
+15,ESP_SEV,Sevilla,Villarreal,ESP_VIL,1,1,Empate,1-1,2023/2024
+15,ESP_ALM,Almeria,Betis,ESP_BET,0,0,Empate,0-0,2023/2024
+15,ESP_MLL,Mallorca,Alaves,ESP_ALA,0,0,Empate,0-0,2023/2024
+15,ESP_OSA,Osasuna,Real Sociedad,ESP_RSO,1,1,Empate,1-1,2023/2024
+15,ESP_RMA,Real Madrid,Granada CF,ESP_GRA,2,0,Local,2-0,2023/2024
+15,ESP_ATH,Ath Bilbao,Rayo Vallecano,ESP_RAY,4,0,Local,4-0,2023/2024
+15,ESP_GIR,Girona,Valencia,ESP_VAL,2,1,Local,2-1,2023/2024
+15,ESP_PAL,Las Palmas,Getafe,ESP_GET,2,0,Local,2-0,2023/2024
+16,ESP_GRA,Granada CF,Ath Bilbao,ESP_ATH,1,1,Empate,1-1,2023/2024
+16,ESP_RAY,Rayo Vallecano,Celta Vigo,ESP_CEL,0,0,Empate,0-0,2023/2024
+16,ESP_FCB,Barcelona,Girona,ESP_GIR,2,4,Visitante,2-4,2023/2024
+16,ESP_CAD,Cadiz CF,Osasuna,ESP_OSA,1,1,Empate,1-1,2023/2024
+16,ESP_ATM,Atl. Madrid,Almeria,ESP_ALM,2,1,Local,2-1,2023/2024
+16,ESP_MLL,Mallorca,Sevilla,ESP_SEV,1,0,Local,1-0,2023/2024
+16,ESP_VIL,Villarreal,Real Sociedad,ESP_RSO,0,3,Visitante,0-3,2023/2024
+16,ESP_BET,Betis,Real Madrid,ESP_RMA,1,1,Empate,1-1,2023/2024
+16,ESP_ALA,Alaves,Las Palmas,ESP_PAL,0,1,Visitante,0-1,2023/2024
+16,ESP_GET,Getafe,Valencia,ESP_VAL,1,0,Local,1-0,2023/2024
+17,ESP_GIR,Girona,Alaves,ESP_ALA,3,0,Local,3-0,2023/2024
+17,ESP_RMA,Real Madrid,Villarreal,ESP_VIL,4,1,Local,4-1,2023/2024
+17,ESP_PAL,Las Palmas,Cadiz CF,ESP_CAD,1,1,Empate,1-1,2023/2024
+17,ESP_RSO,Real Sociedad,Betis,ESP_BET,0,0,Empate,0-0,2023/2024
+17,ESP_ALM,Almeria,Mallorca,ESP_MLL,0,0,Empate,0-0,2023/2024
+17,ESP_VAL,Valencia,Barcelona,ESP_FCB,1,1,Empate,1-1,2023/2024
+17,ESP_SEV,Sevilla,Getafe,ESP_GET,0,3,Visitante,0-3,2023/2024
+17,ESP_ATH,Ath Bilbao,Atl. Madrid,ESP_ATM,2,0,Local,2-0,2023/2024
+17,ESP_CEL,Celta Vigo,Granada CF,ESP_GRA,1,0,Local,1-0,2023/2024
+17,ESP_OSA,Osasuna,Rayo Vallecano,ESP_RAY,1,0,Local,1-0,2023/2024
+18,ESP_ALA,Alaves,Real Madrid,ESP_RMA,0,1,Visitante,0-1,2023/2024
+18,ESP_MLL,Mallorca,Osasuna,ESP_OSA,3,2,Local,3-2,2023/2024
+18,ESP_BET,Betis,Girona,ESP_GIR,1,1,Empate,1-1,2023/2024
+18,ESP_CAD,Cadiz CF,Real Sociedad,ESP_RSO,0,0,Empate,0-0,2023/2024
+18,ESP_ATH,Ath Bilbao,Las Palmas,ESP_PAL,1,0,Local,1-0,2023/2024
+18,ESP_VIL,Villarreal,Celta Vigo,ESP_CEL,3,2,Local,3-2,2023/2024
+18,ESP_FCB,Barcelona,Almeria,ESP_ALM,3,2,Local,3-2,2023/2024
+18,ESP_ATM,Atl. Madrid,Getafe,ESP_GET,3,3,Empate,3-3,2023/2024
+18,ESP_GRA,Granada CF,Sevilla,ESP_SEV,0,3,Visitante,0-3,2023/2024
+18,ESP_RAY,Rayo Vallecano,Valencia,ESP_VAL,0,1,Visitante,0-1,2023/2024
+19,ESP_PAL,Las Palmas,Barcelona,ESP_FCB,1,2,Visitante,1-2,2023/2024
+19,ESP_SEV,Sevilla,Ath Bilbao,ESP_ATH,0,2,Visitante,0-2,2023/2024
+19,ESP_OSA,Osasuna,Almeria,ESP_ALM,1,0,Local,1-0,2023/2024
+19,ESP_GIR,Girona,Atl. Madrid,ESP_ATM,4,3,Local,4-3,2023/2024
+19,ESP_CEL,Celta Vigo,Betis,ESP_BET,2,1,Local,2-1,2023/2024
+19,ESP_RMA,Real Madrid,Mallorca,ESP_MLL,1,0,Local,1-0,2023/2024
+19,ESP_GRA,Granada CF,Cadiz CF,ESP_CAD,2,0,Local,2-0,2023/2024
+19,ESP_VAL,Valencia,Villarreal,ESP_VIL,3,1,Local,3-1,2023/2024
+19,ESP_RSO,Real Sociedad,Alaves,ESP_ALA,1,1,Empate,1-1,2023/2024
+19,ESP_GET,Getafe,Rayo Vallecano,ESP_RAY,0,2,Visitante,0-2,2023/2024
+20,ESP_GET,Getafe,Real Madrid,ESP_RMA,0,2,Visitante,0-2,2023/2024
+20,ESP_ATM,Atl. Madrid,Rayo Vallecano,ESP_RAY,2,1,Local,2-1,2023/2024
+20,ESP_FCB,Barcelona,Osasuna,ESP_OSA,1,0,Local,1-0,2023/2024
+20,ESP_CAD,Cadiz CF,Valencia,ESP_VAL,1,4,Visitante,1-4,2023/2024
+20,ESP_ALM,Almeria,Girona,ESP_GIR,0,0,Empate,0-0,2023/2024
+20,ESP_BET,Betis,Granada CF,ESP_GRA,1,0,Local,1-0,2023/2024
+20,ESP_ATH,Ath Bilbao,Real Sociedad,ESP_RSO,2,1,Local,2-1,2023/2024
+20,ESP_MLL,Mallorca,Celta Vigo,ESP_CEL,1,1,Empate,1-1,2023/2024
+20,ESP_PAL,Las Palmas,Villarreal,ESP_VIL,3,0,Local,3-0,2023/2024
+20,ESP_SEV,Sevilla,Alaves,ESP_ALA,2,3,Visitante,2-3,2023/2024
+21,ESP_GRA,Granada CF,Atl. Madrid,ESP_ATM,0,1,Visitante,0-1,2023/2024
+21,ESP_GIR,Girona,Sevilla,ESP_SEV,5,1,Local,5-1,2023/2024
+21,ESP_BET,Betis,Barcelona,ESP_FCB,2,4,Visitante,2-4,2023/2024
+21,ESP_RMA,Real Madrid,Almeria,ESP_ALM,3,2,Local,3-2,2023/2024
+21,ESP_OSA,Osasuna,Getafe,ESP_GET,3,2,Local,3-2,2023/2024
+21,ESP_CEL,Celta Vigo,Real Sociedad,ESP_RSO,0,1,Visitante,0-1,2023/2024
+21,ESP_VAL,Valencia,Ath Bilbao,ESP_ATH,1,0,Local,1-0,2023/2024
+21,ESP_VIL,Villarreal,Mallorca,ESP_MLL,1,1,Empate,1-1,2023/2024
+21,ESP_RAY,Rayo Vallecano,Las Palmas,ESP_PAL,0,2,Visitante,0-2,2023/2024
+21,ESP_ALA,Alaves,Cadiz CF,ESP_CAD,1,0,Local,1-0,2023/2024
+22,ESP_GET,Getafe,Granada CF,ESP_GRA,2,0,Local,2-0,2023/2024
+22,ESP_ATM,Atl. Madrid,Valencia,ESP_VAL,2,0,Local,2-0,2023/2024
+22,ESP_SEV,Sevilla,Osasuna,ESP_OSA,1,1,Empate,1-1,2023/2024
+22,ESP_CAD,Cadiz CF,Ath Bilbao,ESP_ATH,0,0,Empate,0-0,2023/2024
+22,ESP_CEL,Celta Vigo,Girona,ESP_GIR,0,1,Visitante,0-1,2023/2024
+22,ESP_MLL,Mallorca,Betis,ESP_BET,0,1,Visitante,0-1,2023/2024
+22,ESP_FCB,Barcelona,Villarreal,ESP_VIL,3,5,Visitante,3-5,2023/2024
+22,ESP_PAL,Las Palmas,Real Madrid,ESP_RMA,1,2,Visitante,1-2,2023/2024
+22,ESP_RSO,Real Sociedad,Rayo Vallecano,ESP_RAY,0,0,Empate,0-0,2023/2024
+22,ESP_ALM,Almeria,Alaves,ESP_ALA,0,3,Visitante,0-3,2023/2024
+23,ESP_RAY,Rayo Vallecano,Sevilla,ESP_SEV,1,2,Visitante,1-2,2023/2024
+23,ESP_RMA,Real Madrid,Atl. Madrid,ESP_ATM,1,1,Empate,1-1,2023/2024
+23,ESP_BET,Betis,Getafe,ESP_GET,1,1,Empate,1-1,2023/2024
+23,ESP_OSA,Osasuna,Celta Vigo,ESP_CEL,0,3,Visitante,0-3,2023/2024
+23,ESP_VIL,Villarreal,Cadiz CF,ESP_CAD,0,0,Empate,0-0,2023/2024
+23,ESP_GIR,Girona,Real Sociedad,ESP_RSO,0,0,Empate,0-0,2023/2024
+23,ESP_ALA,Alaves,Barcelona,ESP_FCB,1,3,Visitante,1-3,2023/2024
+23,ESP_GRA,Granada CF,Las Palmas,ESP_PAL,1,1,Empate,1-1,2023/2024
+23,ESP_VAL,Valencia,Almeria,ESP_ALM,2,1,Local,2-1,2023/2024
+23,ESP_ATH,Ath Bilbao,Mallorca,ESP_MLL,4,0,Local,4-0,2023/2024
+24,ESP_ALM,Almeria,Ath Bilbao,ESP_ATH,0,0,Empate,0-0,2023/2024
+24,ESP_FCB,Barcelona,Granada CF,ESP_GRA,3,3,Empate,3-3,2023/2024
+24,ESP_SEV,Sevilla,Atl. Madrid,ESP_ATM,1,0,Local,1-0,2023/2024
+24,ESP_MLL,Mallorca,Rayo Vallecano,ESP_RAY,2,1,Local,2-1,2023/2024
+24,ESP_GET,Getafe,Celta Vigo,ESP_CEL,3,2,Local,3-2,2023/2024
+24,ESP_PAL,Las Palmas,Valencia,ESP_VAL,2,0,Local,2-0,2023/2024
+24,ESP_RMA,Real Madrid,Girona,ESP_GIR,4,0,Local,4-0,2023/2024
+24,ESP_RSO,Real Sociedad,Osasuna,ESP_OSA,0,1,Visitante,0-1,2023/2024
+24,ESP_ALA,Alaves,Villarreal,ESP_VIL,1,1,Empate,1-1,2023/2024
+24,ESP_CAD,Cadiz CF,Betis,ESP_BET,0,2,Visitante,0-2,2023/2024
+25,ESP_ATH,Ath Bilbao,Girona,ESP_GIR,3,2,Local,3-2,2023/2024
+25,ESP_BET,Betis,Alaves,ESP_ALA,0,0,Empate,0-0,2023/2024
+25,ESP_MLL,Mallorca,Real Sociedad,ESP_RSO,1,2,Visitante,1-2,2023/2024
+25,ESP_GRA,Granada CF,Almeria,ESP_ALM,1,1,Empate,1-1,2023/2024
+25,ESP_RAY,Rayo Vallecano,Real Madrid,ESP_RMA,1,1,Empate,1-1,2023/2024
+25,ESP_VAL,Valencia,Sevilla,ESP_SEV,0,0,Empate,0-0,2023/2024
+25,ESP_CEL,Celta Vigo,Barcelona,ESP_FCB,1,2,Visitante,1-2,2023/2024
+25,ESP_OSA,Osasuna,Cadiz CF,ESP_CAD,2,0,Local,2-0,2023/2024
+25,ESP_ATM,Atl. Madrid,Las Palmas,ESP_PAL,5,0,Local,5-0,2023/2024
+25,ESP_VIL,Villarreal,Getafe,ESP_GET,1,1,Empate,1-1,2023/2024
+26,ESP_GRA,Granada CF,Valencia,ESP_VAL,0,1,Visitante,0-1,2023/2024
+26,ESP_GIR,Girona,Rayo Vallecano,ESP_RAY,3,0,Local,3-0,2023/2024
+26,ESP_RMA,Real Madrid,Sevilla,ESP_SEV,1,0,Local,1-0,2023/2024
+26,ESP_PAL,Las Palmas,Osasuna,ESP_OSA,1,1,Empate,1-1,2023/2024
+26,ESP_BET,Betis,Ath Bilbao,ESP_ATH,3,1,Local,3-1,2023/2024
+26,ESP_CAD,Cadiz CF,Celta Vigo,ESP_CEL,2,2,Empate,2-2,2023/2024
+26,ESP_ALM,Almeria,Atl. Madrid,ESP_ATM,2,2,Empate,2-2,2023/2024
+26,ESP_ALA,Alaves,Mallorca,ESP_MLL,1,1,Empate,1-1,2023/2024
+26,ESP_FCB,Barcelona,Getafe,ESP_GET,4,0,Local,4-0,2023/2024
+26,ESP_RSO,Real Sociedad,Villarreal,ESP_VIL,1,3,Visitante,1-3,2023/2024
+27,ESP_OSA,Osasuna,Alaves,ESP_ALA,1,0,Local,1-0,2023/2024
+27,ESP_ATH,Ath Bilbao,Barcelona,ESP_FCB,0,0,Empate,0-0,2023/2024
+27,ESP_MLL,Mallorca,Girona,ESP_GIR,1,0,Local,1-0,2023/2024
+27,ESP_ATM,Atl. Madrid,Betis,ESP_BET,2,1,Local,2-1,2023/2024
+27,ESP_VIL,Villarreal,Granada CF,ESP_GRA,5,1,Local,5-1,2023/2024
+27,ESP_VAL,Valencia,Real Madrid,ESP_RMA,2,2,Empate,2-2,2023/2024
+27,ESP_GET,Getafe,Las Palmas,ESP_PAL,3,3,Empate,3-3,2023/2024
+27,ESP_RAY,Rayo Vallecano,Cadiz CF,ESP_CAD,1,1,Empate,1-1,2023/2024
+27,ESP_SEV,Sevilla,Real Sociedad,ESP_RSO,3,2,Local,3-2,2023/2024
+27,ESP_CEL,Celta Vigo,Almeria,ESP_ALM,1,0,Local,1-0,2023/2024
+28,ESP_ALM,Almeria,Sevilla,ESP_SEV,2,2,Empate,2-2,2023/2024
+28,ESP_BET,Betis,Villarreal,ESP_VIL,2,3,Visitante,2-3,2023/2024
+28,ESP_RMA,Real Madrid,Celta Vigo,ESP_CEL,4,0,Local,4-0,2023/2024
+28,ESP_PAL,Las Palmas,Ath Bilbao,ESP_ATH,0,2,Visitante,0-2,2023/2024
+28,ESP_ALA,Alaves,Rayo Vallecano,ESP_RAY,1,0,Local,1-0,2023/2024
+28,ESP_GIR,Girona,Osasuna,ESP_OSA,2,0,Local,2-0,2023/2024
+28,ESP_GRA,Granada CF,Real Sociedad,ESP_RSO,2,3,Visitante,2-3,2023/2024
+28,ESP_CAD,Cadiz CF,Atl. Madrid,ESP_ATM,2,0,Local,2-0,2023/2024
+28,ESP_VAL,Valencia,Getafe,ESP_GET,1,0,Local,1-0,2023/2024
+28,ESP_FCB,Barcelona,Mallorca,ESP_MLL,1,0,Local,1-0,2023/2024
+29,ESP_ATM,Atl. Madrid,Barcelona,ESP_FCB,0,3,Visitante,0-3,2023/2024
+29,ESP_RAY,Rayo Vallecano,Betis,ESP_BET,2,0,Local,2-0,2023/2024
+29,ESP_PAL,Las Palmas,Almeria,ESP_ALM,0,1,Visitante,0-1,2023/2024
+29,ESP_VIL,Villarreal,Valencia,ESP_VAL,1,0,Local,1-0,2023/2024
+29,ESP_SEV,Sevilla,Celta Vigo,ESP_CEL,1,2,Visitante,1-2,2023/2024
+29,ESP_ATH,Ath Bilbao,Alaves,ESP_ALA,2,0,Local,2-0,2023/2024
+29,ESP_GET,Getafe,Girona,ESP_GIR,1,0,Local,1-0,2023/2024
+29,ESP_OSA,Osasuna,Real Madrid,ESP_RMA,2,4,Visitante,2-4,2023/2024
+29,ESP_MLL,Mallorca,Granada CF,ESP_GRA,1,0,Local,1-0,2023/2024
+29,ESP_RSO,Real Sociedad,Cadiz CF,ESP_CAD,2,0,Local,2-0,2023/2024
+30,ESP_VIL,Villarreal,Atl. Madrid,ESP_ATM,1,2,Visitante,1-2,2023/2024
+30,ESP_RMA,Real Madrid,Ath Bilbao,ESP_ATH,2,0,Local,2-0,2023/2024
+30,ESP_ALA,Alaves,Real Sociedad,ESP_RSO,0,1,Visitante,0-1,2023/2024
+30,ESP_GIR,Girona,Betis,ESP_BET,3,2,Local,3-2,2023/2024
+30,ESP_CEL,Celta Vigo,Rayo Vallecano,ESP_RAY,0,0,Empate,0-0,2023/2024
+30,ESP_FCB,Barcelona,Las Palmas,ESP_PAL,1,0,Local,1-0,2023/2024
+30,ESP_VAL,Valencia,Mallorca,ESP_MLL,0,0,Empate,0-0,2023/2024
+30,ESP_ALM,Almeria,Osasuna,ESP_OSA,0,3,Visitante,0-3,2023/2024
+30,ESP_GET,Getafe,Sevilla,ESP_SEV,0,1,Visitante,0-1,2023/2024
+30,ESP_CAD,Cadiz CF,Granada CF,ESP_GRA,1,0,Local,1-0,2023/2024
+31,ESP_OSA,Osasuna,Valencia,ESP_VAL,0,1,Visitante,0-1,2023/2024
+31,ESP_RSO,Real Sociedad,Almeria,ESP_ALM,2,2,Empate,2-2,2023/2024
+31,ESP_ATH,Ath Bilbao,Villarreal,ESP_VIL,1,1,Empate,1-1,2023/2024
+31,ESP_GRA,Granada CF,Alaves,ESP_ALA,2,0,Local,2-0,2023/2024
+31,ESP_PAL,Las Palmas,Sevilla,ESP_SEV,0,2,Visitante,0-2,2023/2024
+31,ESP_CAD,Cadiz CF,Barcelona,ESP_FCB,0,1,Visitante,0-1,2023/2024
+31,ESP_MLL,Mallorca,Real Madrid,ESP_RMA,0,1,Visitante,0-1,2023/2024
+31,ESP_RAY,Rayo Vallecano,Getafe,ESP_GET,0,0,Empate,0-0,2023/2024
+31,ESP_ATM,Atl. Madrid,Girona,ESP_GIR,3,1,Local,3-1,2023/2024
+31,ESP_BET,Betis,Celta Vigo,ESP_CEL,2,1,Local,2-1,2023/2024
+32,ESP_SEV,Sevilla,Mallorca,ESP_MLL,2,1,Local,2-1,2023/2024
+32,ESP_RMA,Real Madrid,Barcelona,ESP_FCB,3,2,Local,3-2,2023/2024
+32,ESP_ALA,Alaves,Atl. Madrid,ESP_ATM,2,0,Local,2-0,2023/2024
+32,ESP_ALM,Almeria,Villarreal,ESP_VIL,1,2,Visitante,1-2,2023/2024
+32,ESP_GET,Getafe,Real Sociedad,ESP_RSO,1,1,Empate,1-1,2023/2024
+32,ESP_GIR,Girona,Cadiz CF,ESP_CAD,4,1,Local,4-1,2023/2024
+32,ESP_VAL,Valencia,Betis,ESP_BET,1,2,Visitante,1-2,2023/2024
+32,ESP_RAY,Rayo Vallecano,Osasuna,ESP_OSA,2,1,Local,2-1,2023/2024
+32,ESP_CEL,Celta Vigo,Las Palmas,ESP_PAL,4,1,Local,4-1,2023/2024
+32,ESP_ATH,Ath Bilbao,Granada CF,ESP_GRA,1,1,Empate,1-1,2023/2024
+33,ESP_FCB,Barcelona,Valencia,ESP_VAL,4,2,Local,4-2,2023/2024
+33,ESP_BET,Betis,Sevilla,ESP_SEV,1,1,Empate,1-1,2023/2024
+33,ESP_VIL,Villarreal,Rayo Vallecano,ESP_RAY,3,0,Local,3-0,2023/2024
+33,ESP_GRA,Granada CF,Osasuna,ESP_OSA,3,0,Local,3-0,2023/2024
+33,ESP_CAD,Cadiz CF,Mallorca,ESP_MLL,1,1,Empate,1-1,2023/2024
+33,ESP_ATM,Atl. Madrid,Ath Bilbao,ESP_ATH,3,1,Local,3-1,2023/2024
+33,ESP_ALA,Alaves,Celta Vigo,ESP_CEL,3,0,Local,3-0,2023/2024
+33,ESP_ALM,Almeria,Getafe,ESP_GET,1,3,Visitante,1-3,2023/2024
+33,ESP_PAL,Las Palmas,Girona,ESP_GIR,0,2,Visitante,0-2,2023/2024
+33,ESP_RSO,Real Sociedad,Real Madrid,ESP_RMA,0,1,Visitante,0-1,2023/2024

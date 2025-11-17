@@ -1,0 +1,6 @@
+- "Top 10 equipos por Puntos en {temporada}."
+- "Equipo con más Puntos en {temporada}."
+- "Top 10 goleadores en {temporada}."
+- "Top 10 clubes por Valor en {temporada}."
+- "Resultados del Real Madrid en la jornada 5 de {temporada}."
+- "Comparar Puntos, GolesAF y GolesEC del Real Madrid y Barcelona en {temporada}."
