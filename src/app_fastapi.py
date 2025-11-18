@@ -46,13 +46,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://hiurma.github.io",
-        "https://hiurma.github.io/laliga-chat-web",
-        "https://hiurma.github.io/laliga-chat-web/",
-        "https://hiurma.github.io/laliga-chat-web/index.html"
-        "http://localhost:8000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
