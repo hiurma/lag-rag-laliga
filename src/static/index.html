@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat LaLiga RAG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b1120;
+      color: #e5e7eb;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .app {
+      background: #020617;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      max-width: 800px;
+      width: 100%;
+      padding: 1.5rem;
+      border: 1px solid #1f2937;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    h1 span.logo {
+      display: inline-flex;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a, #15803d);
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .9rem;
+    }
+
+    .subtitle {
+      font-size: .9rem;
+      color: #9ca3af;
+      margin-bottom: 1rem;
+    }
+
+    .chat-window {
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      padding: 1rem;
+      height: 420px;
+      overflow-y: auto;
+      font-size: .9rem;
+    }
+
+    .msg {
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .msg.user {
+      text-align: right;
+      color: #e5e7eb;
+    }
+
+    .msg.bot {
+      text-align: left;
+      color: #d1d5db;
+    }
+
+    .msg.system {
+      text-align: center;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .msg strong {
+      color: #22c55e;
+    }
+
+    .msg pre {
+      background: #020617;
+      border-radius: 8px;
+      padding: .5rem .75rem;
+      border: 1px solid #1f2937;
+      overflow-x: auto;
+      font-size: .8rem;
+    }
+
+    form {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    textarea {
+      flex: 1;
+      resize: none;
+      min-height: 52px;
+      max-height: 120px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      padding: .5rem .75rem;
+      background: #020617;
+      color: #e5e7eb;
+      font-family: inherit;
+      font-size: .9rem;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #22c55e;
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.6);
+    }
+
+    button {
+      border-radius: 10px;
+      border: none;
+      padding: 0 1rem;
+      background: #22c55e;
+      color: #022c22;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 90px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .hint {
+      margin-top: .5rem;
+      font-size: .75rem;
+      color: #6b7280;
+    }
+
+    a {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>
+      <span class="logo">⚽</span>
+      Chat LaLiga RAG
+    </h1>
+    <div class="subtitle">
+      Pregúntame por la <strong>clasificación actual</strong>, 
+      <strong>títulos de Liga</strong> o <strong>pronósticos de partidos</strong>.
+    </div>
+
+  <div id="chat">
+    <div id="messages"></div>
+
+    <form id="chat-form">
+      <input
+        id="user-input"
+        type="text"
+        placeholder="Escribe tu pregunta sobre LaLiga..."
+        autocomplete="off"
+      />
+      <button id="send-btn" type="submit">Enviar</button>
+    </form>
+  </div>
+
+    <form id="form">
+      <textarea id="input" placeholder="Escribe tu pregunta sobre LaLiga..."></textarea>
+      <button type="submit" id="sendBtn">Enviar</button>
+    </form>
+    <div class="hint">
+      La API funciona mientras tu servidor FastAPI en Codespaces esté encendido.
+    </div>
+  </div>
+
+  <script>
+  const API_URL =
+    "/chat"; 
+
+  const messagesEl = document.getElementById("messages");
+  const formEl = document.getElementById("chat-form");
+  const inputEl = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+
+  function appendMessage(sender, text) {
+    const bubble = document.createElement("div");
+    bubble.className = sender === "user" ? "msg user" : "msg bot";
+    bubble.textContent = text;
+    messagesEl.appendChild(bubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  formEl.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const pregunta = (inputEl.value || "").trim();
+    if (!pregunta) return;
+
+    // 1) pinta el mensaje del usuario
+    appendMessage("user", pregunta);
+    inputEl.value = "";
+    inputEl.focus();
+    if (sendBtn) sendBtn.disabled = true;
+
+    try {
+      // 2) llama a tu API igual que en Swagger
+      const resp = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ pregunta: pregunta }),
+      });
+
+      let data;
+      try {
+        data = await resp.json();
+      } catch (e) {
+        appendMessage("bot", "⚠️ No pude leer la respuesta JSON de la API.");
+        return;
+      }
+
+      if (!resp.ok) {
+        appendMessage(
+          "bot",
+          "⚠️ Error HTTP " +
+            resp.status +
+            " - " +
+            (data.detail || JSON.stringify(data))
+        );
+        return;
+      }
+
+      // 3) pinta la respuesta del backend
+      const texto =
+        (data && (data.respuesta || data.response || data.message)) ||
+        JSON.stringify(data);
+      appendMessage("bot", texto);
+    } catch (err) {
+      appendMessage("bot", "⚠️ Error llamando a la API: " + err.message);
+    } finally {
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
