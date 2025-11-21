@@ -8,6 +8,7 @@ import unicodedata
 import re
 import pandas as pd
 from typing import Optional, List
+from fastapi.responses import FileResponse
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,6 +25,17 @@ from pydantic import BaseModel
 from chat_agent import ChatAgent   # <- si tu archivo se llama igual
 
 app = FastAPI(title="LaLiga RAG API")
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# STATIC_DIR = os.path.join(BASE_DIR, "..", "static")
+
+# @app.get("/", include_in_schema=False)
+# async def home():
+#     """Sirve la página web del chat."""
+#     index_path = os.path.join(STATIC_DIR, "index.html")
+#     return FileResponse(index_path)
+
 
 import re
 from typing import List
@@ -637,12 +649,14 @@ class AskBody(BaseModel):
     pregunta: Optional[str] = None
     question: Optional[str] = None
 
-@app.get("/")
-def root():
-    return {"mensaje": "API activa"}
+@app.get("/", include_in_schema=False)
+async def home():
+    """Sirve la página web del chat."""
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    return FileResponse(index_path)
 
 @app.get("/health")
-def health():
+async def health():
     return {"ok": True}
 
 from pydantic import BaseModel
