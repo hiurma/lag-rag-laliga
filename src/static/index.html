@@ -1,127 +1,145 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat LaLiga RAG</title>
-
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0d1117;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 40px auto;
-            background: #161b22;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.4);
-        }
-
-        h1 {
-            text-align: center;
-            color: #00ff90;
-            margin-bottom: 10px;
-        }
-
-        #messages {
-            background: #0d1117;
-            padding: 12px;
-            border-radius: 8px;
-            min-height: 200px;
-            margin-bottom: 20px;
-            overflow-y: auto;
-            border: 1px solid #30363d;
-        }
-
-        .msg-user { color: #00b7ff; margin-bottom: 10px; }
-        .msg-bot  { color: #00ff90; margin-bottom: 10px; }
-
-        input {
-            width: 75%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #30363d;
-            background-color: #0d1117;
-            color: white;
-        }
-
-        button {
-            width: 20%;
-            margin-left: 10px;
-            padding: 10px;
-            border: none;
-            background-color: #00ff90;
-            color: black;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background-color: #00cc70;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat LaLiga RAG</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0e1116;
+      color: #e6edf3;
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+    .chatbox {
+      width: 100%;
+      max-width: 820px;
+      background: #151a22;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.35);
+    }
+    h1 { font-size: 20px; margin: 0 0 6px 0; }
+    .sub { opacity:.8; font-size: 13px; margin-bottom: 12px; }
+    .msgs {
+      height: 420px;
+      overflow-y: auto;
+      background: #0f141c;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #202636;
+    }
+    .msg { margin: 8px 0; line-height: 1.35; }
+    .me { color: #9cdcfe; }
+    .bot { color: #b5f5d1; }
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #2a3145;
+      background: #0f141c;
+      color: #e6edf3;
+      font-size: 15px;
+      outline: none;
+    }
+    button {
+      padding: 0 16px;
+      border-radius: 10px;
+      border: none;
+      background: #28a745;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    pre {
+      white-space: pre-wrap;
+      background: #0b0f15;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #252c3e;
+      margin-top: 6px;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1>Chat LaLiga RAG</h1>
+  <div class="chatbox">
+    <h1>Chat LaLiga RAG</h1>
+    <div class="sub">Pregúntame por clasificación, títulos o fichajes.</div>
 
-        <div id="messages"></div>
+    <div id="msgs" class="msgs"></div>
 
-        <div style="display: flex">
-            <input id="inputMsg" placeholder="Escribe tu pregunta sobre LaLiga..." />
-            <button onclick="sendMessage()">Enviar</button>
-        </div>
-
+    <div class="row">
+      <input id="q" placeholder="Escribe tu pregunta sobre LaLiga..." />
+      <button id="send">Enviar</button>
     </div>
+  </div>
 
-    <script>
-        const API_URL = "https://lag-rag-api.onrender.com/chat";
+  <script>
+    // ✅ URL de tu API en Render:
+    const API_URL = "https://lag-rag-api.onrender.com/chat";
 
-        async function sendMessage() {
-            let input = document.getElementById("inputMsg");
-            let text = input.value.trim();
-            if (!text) return;
+    const msgs = document.getElementById("msgs");
+    const q = document.getElementById("q");
+    const send = document.getElementById("send");
 
-            appendMessage("user", text);
-            input.value = "";
+    function addMsg(text, cls) {
+      const div = document.createElement("div");
+      div.className = "msg " + cls;
+      div.innerHTML = text;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
 
-            try {
-                const res = await fetch(API_URL, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({ pregunta: text })
-                });
+    async function ask() {
+      const question = q.value.trim();
+      if (!question) return;
 
-                if (!res.ok) {
-                    appendMessage("bot", "⚠️ Error llamando a la API.");
-                    return;
-                }
+      addMsg("🧑‍💻 " + question, "me");
+      q.value = "";
+      send.disabled = true;
 
-                const data = await res.json();
-                appendMessage("bot", data.respuesta);
-            }
-            catch (e) {
-                appendMessage("bot", "❌ Error: No se pudo conectar con la API.");
-            }
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pregunta: question })
+        });
+
+        if (!res.ok) {
+          const t = await res.text();
+          throw new Error("HTTP " + res.status + " - " + t);
         }
 
-        function appendMessage(who, text) {
-            const box = document.getElementById("messages");
-            const div = document.createElement("div");
-            div.className = (who === "user") ? "msg-user" : "msg-bot";
-            div.textContent = (who === "user" ? "Tú: " : "Bot: ") + text;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
-    </script>
+        const data = await res.json();
 
+        // data.respuesta es lo principal
+        addMsg("🤖 " + (data.respuesta ?? "(sin respuesta)"), "bot");
+
+        // si viene tabla markdown/array, la mostramos
+        if (data.tabla) {
+          addMsg("<pre>" + data.tabla + "</pre>", "bot");
+        }
+
+      } catch (e) {
+        addMsg("⚠️ Error llamando a la API: " + e.message, "bot");
+      } finally {
+        send.disabled = false;
+        q.focus();
+      }
+    }
+
+    send.addEventListener("click", ask);
+    q.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") ask();
+    });
+  </script>
 </body>
 </html>
