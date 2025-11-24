@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__)))
 from chat_agent import ChatAgent
 
 # -------------------------------------------------------------------
