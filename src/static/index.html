@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat LaLiga RAG</title>
+
   <style>
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -69,10 +70,11 @@
     }
   </style>
 </head>
+
 <body>
   <div class="chatbox">
     <h1>Chat LaLiga RAG</h1>
-    <div class="sub">Pregúntame por clasificación, títulos o fichajes.</div>
+    <div class="sub">Pregúntame por la clasificación actual, títulos o fichajes.</div>
 
     <div id="msgs" class="msgs"></div>
 
@@ -83,8 +85,8 @@
   </div>
 
   <script>
-    // ✅ URL de tu API en Render:
-    const API_URL = "https://lag-rag-api.onrender.com/chat";
+    // 🔥 AHORA EL FRONT USA LA MISMA URL DEL SERVIDOR (Render)
+    const API_URL = "/chat";
 
     const msgs = document.getElementById("msgs");
     const q = document.getElementById("q");
@@ -120,10 +122,8 @@
 
         const data = await res.json();
 
-        // data.respuesta es lo principal
         addMsg("🤖 " + (data.respuesta ?? "(sin respuesta)"), "bot");
 
-        // si viene tabla markdown/array, la mostramos
         if (data.tabla) {
           addMsg("<pre>" + data.tabla + "</pre>", "bot");
         }
@@ -140,6 +140,7 @@
     q.addEventListener("keydown", (e) => {
       if (e.key === "Enter") ask();
     });
+
   </script>
 </body>
 </html>
