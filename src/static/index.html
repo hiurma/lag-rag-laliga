@@ -1,114 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat LaLiga RAG</title>
 
     <style>
         body {
-            background-color: #111;
-            color: #eee;
-            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background-color: #0d1117;
+            color: white;
+            font-family: Arial, sans-serif;
         }
+
         .container {
             max-width: 700px;
-            margin: auto;
-            background: #1a1a1a;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            margin: 40px auto;
+            background: #161b22;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.4);
         }
+
         h1 {
             text-align: center;
-            color: #4CAF50;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            border: none;
+            color: #00ff90;
             margin-bottom: 10px;
-            font-size: 16px;
         }
-        button {
-            width: 100%;
+
+        #messages {
+            background: #0d1117;
             padding: 12px;
-            background: #4CAF50;
+            border-radius: 8px;
+            min-height: 200px;
+            margin-bottom: 20px;
+            overflow-y: auto;
+            border: 1px solid #30363d;
+        }
+
+        .msg-user { color: #00b7ff; margin-bottom: 10px; }
+        .msg-bot  { color: #00ff90; margin-bottom: 10px; }
+
+        input {
+            width: 75%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            background-color: #0d1117;
             color: white;
-            font-size: 16px;
+        }
+
+        button {
+            width: 20%;
+            margin-left: 10px;
+            padding: 10px;
             border: none;
-            border-radius: 6px;
+            background-color: #00ff90;
+            color: black;
+            border-radius: 8px;
             cursor: pointer;
-        }
-        button:hover {
-            background: #43a047;
-        }
-        .respuesta {
-            margin-top: 20px;
-            padding: 15px;
-            background: #222;
-            border-radius: 6px;
-            white-space: pre-wrap;
-        }
-        .error {
-            color: #ff5252;
             font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #00cc70;
         }
     </style>
 </head>
 
 <body>
+    <div class="container">
+        <h1>Chat LaLiga RAG</h1>
 
-<div class="container">
-    <h1>Chat LaLiga RAG</h1>
-    <p>Pregúntame por clasificación, resultados, fichajes, informes o estadísticas.</p>
+        <div id="messages"></div>
 
-    <input id="preguntaInput" type="text" placeholder="Escribe tu pregunta sobre LaLiga...">
-    <button onclick="enviarPregunta()">Enviar</button>
+        <div style="display: flex">
+            <input id="inputMsg" placeholder="Escribe tu pregunta sobre LaLiga..." />
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
 
-    <div id="salida" class="respuesta"></div>
-</div>
+    </div>
 
-<script>
-    // === URL correcta de tu API en Render ===
-    const API_URL = "https://lag-rag-api.onrender.com/chat";
+    <script>
+        const API_URL = "https://lag-rag-api.onrender.com/chat";
 
-    async function enviarPregunta() {
-        const pregunta = document.getElementById("preguntaInput").value.trim();
-        const salida = document.getElementById("salida");
+        async function sendMessage() {
+            let input = document.getElementById("inputMsg");
+            let text = input.value.trim();
+            if (!text) return;
 
-        if (!pregunta) {
-            salida.innerHTML = "<span class='error'>Debes escribir una pregunta.</span>";
-            return;
-        }
+            appendMessage("user", text);
+            input.value = "";
 
-        salida.innerHTML = "⏳ Consultando API…";
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ pregunta: text })
+                });
 
-        try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ pregunta })
-            });
+                if (!res.ok) {
+                    appendMessage("bot", "⚠️ Error llamando a la API.");
+                    return;
+                }
 
-            if (!response.ok) {
-                throw new Error("La API devolvió un error: " + response.status);
+                const data = await res.json();
+                appendMessage("bot", data.respuesta);
             }
-
-            const data = await response.json();
-            salida.innerHTML = JSON.stringify(data, null, 2);
-
-        } catch (error) {
-            salida.innerHTML =
-                "<span class='error'>❌ Error llamando a la API:</span>\n" +
-                error.message +
-                "\n\n(El servidor puede estar arrancando o Render te está haciendo esperar 50s)";
+            catch (e) {
+                appendMessage("bot", "❌ Error: No se pudo conectar con la API.");
+            }
         }
-    }
-</script>
+
+        function appendMessage(who, text) {
+            const box = document.getElementById("messages");
+            const div = document.createElement("div");
+            div.className = (who === "user") ? "msg-user" : "msg-bot";
+            div.textContent = (who === "user" ? "Tú: " : "Bot: ") + text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
 
 </body>
 </html>
