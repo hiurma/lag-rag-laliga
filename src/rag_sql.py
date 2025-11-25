@@ -26,23 +26,32 @@ def _run_sql(sql: str, params: tuple = ()) -> tuple[list[str], list[tuple]]:
     return cols, rows[:10]
 
 
-def _guess_temporada(q: str) -> Optional[str]:
+def _guess_temporada(q: str) -> str | None:
     """
-    Detecta temporada del estilo 2024/2025 o 2024-2025 en el texto.
+    Detecta la temporada mirando solo el primer año de 4 dígitos (20xx).
+    Ejemplos que captura:
+      - '2025/2026'
+      - '2025-26'
+      - 'temp 2025/26'
+    Devuelve '2025', que usaremos como prefijo para filtrar.
     """
-    m = re.search(r"(20\d{2})[/-](20\d{2})", q)
+    m = re.search(r"(20\d{2})", q)
     if m:
-        t1, t2 = m.group(1), m.group(2)
-        return f"{t1}/{t2}"
+        return m.group(1)  # '2025'
     return None
 
 
 def _clean_temporada_for_where(colname: str) -> str:
     """
-    Expresión SQL que iguala temporada ignorando '-' vs '/' y espacios.
-    EJ: REPLACE(TRIM(Temporada), '-', '/') = REPLACE(TRIM(?), '-', '/')
+    Construye una condición SQL que filtra por año inicial de la temporada.
+    Ej: si temp='2025', coincide con:
+      - '2025/2026'
+      - '2025-26'
+      - '2025-2026'
+      - 'Temp 2025/26'
     """
-    return f"REPLACE(TRIM({colname}), '-', '/') = REPLACE(TRIM(?), '-', '/')"
+    # Normalizamos espacios y usamos LIKE '2025%'
+    return f"TRIM({colname}) LIKE ? || '%'"
 
 
 # =========================
