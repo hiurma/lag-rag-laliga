@@ -1,18 +1,18 @@
-import os
+# --- rag_sql.py --------------------------------
+from __future__ import annotations
+
 import sqlite3
 from pathlib import Path
 import re
-import unicodedata
+from typing import Tuple, List, Dict, Any, Optional
+
 import pandas as pd
-from typing import Optional, List, Tuple
 
 DB_PATH = Path("data/laliga.sqlite")
 
-# =========================
-# Helpers generales SQL
-# =========================
+# ----------------- Helpers generales ----------------------------
 
-def _run_sql(sql: str, params: tuple = ()) -> tuple[list[str], list[tuple]]:
+def _run_sql(sql: str, params: tuple = ()) -> Tuple[List[str], List[tuple]]:
     """
     Ejecuta SQL sobre laliga.sqlite y devuelve (columnas, filas).
     Máximo 10 filas para no petar el response.
@@ -26,37 +26,36 @@ def _run_sql(sql: str, params: tuple = ()) -> tuple[list[str], list[tuple]]:
     return cols, rows[:10]
 
 
-def _guess_temporada(q: str) -> str | None:
+def _guess_temporada(q: str) -> Optional[str]:
     """
-    Detecta la temporada mirando solo el primer año de 4 dígitos (20xx).
-    Ejemplos que captura:
-      - '2025/2026'
-      - '2025-26'
-      - 'temp 2025/26'
-    Devuelve '2025', que usaremos como prefijo para filtrar.
+    Detecta la temporada en el texto.
+    Busca patrones tipo 2024/2025 o 2025-2026.
     """
-    m = re.search(r"(20\d{2})", q)
+    m = re.search(r"(20\d{2})[/-](20\d{2})", q)
     if m:
-        return m.group(1)  # '2025'
+        t1, t2 = m.group(1), m.group(2)
+        return f"{t1}/{t2}"
     return None
 
 
 def _clean_temporada_for_where(colname: str) -> str:
     """
-    Construye una condición SQL que filtra por año inicial de la temporada.
-    Ej: si temp='2025', coincide con:
-      - '2025/2026'
-      - '2025-26'
-      - '2025-2026'
-      - 'Temp 2025/26'
+    Devuelve una expresión SQL que iguala temporada ignorando '-' vs '/' y espacios.
+    EJ: REPLACE(TRIM(Temporada), '-', '/') = REPLACE(TRIM(?), '-', '/')
     """
-    # Normalizamos espacios y usamos LIKE '2025%'
-    return f"TRIM({colname}) LIKE ? || '%'"
+    return f"REPLACE(TRIM({colname}), '-', '/') = REPLACE(TRIM(?), '-', '/')"
 
 
-# =========================
-# Consultas "canónicas"
-# =========================
+def _simple_table_text(df: pd.DataFrame) -> str:
+    if df is None or df.empty:
+        return "(sin filas)"
+    try:
+        return "\n" + df.to_string(index=False) + "\n"
+    except Exception:
+        return "\n" + "\n".join(str(r) for _, r in df.iterrows()) + "\n"
+
+
+# ----------------- SQL "canónicos" para stats --------------------
 
 def _sql_top_goleadores(temp: Optional[str]):
     where = "1=1"
@@ -64,7 +63,7 @@ def _sql_top_goleadores(temp: Optional[str]):
     if temp:
         where = _clean_temporada_for_where("Temporada")
         params = (temp,)
-    # usamos MAX(Goles) por jugador por si hay varias filas
+
     sql = f"""
         SELECT
             Jugador,
@@ -86,20 +85,20 @@ def _sql_top_valor_clubes(temp: Optional[str]):
         where = _clean_temporada_for_where("Temporada")
         params = (temp,)
 
-    # Convertimos texto tipo "€120.5M" o "120,5" a número REAL
     val_num = (
-        "CAST(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Valor,'€',''),'M€',''),'M',''),'m',''),' ','')"
-        ",',','.') AS REAL)"
+        "CAST(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Valor,'€',''),'M€',''),"
+        "'M',''),'m',''),' ','')"
+        " AS REAL)"
     )
 
     sql = f"""
         SELECT
             Club,
-            MAX({val_num}) AS Valor_Millones
+            MAX({val_num}) AS Valor
         FROM valor_clubes
         WHERE {where}
         GROUP BY Club
-        ORDER BY Valor_Millones DESC
+        ORDER BY Valor DESC
         LIMIT 10;
     """
     return sql, params, f"Clubes con más valor {temp or '(todas las temporadas)'}"
@@ -113,8 +112,9 @@ def _sql_top_fichajes(temp: Optional[str]):
         params = (temp,)
 
     coste_num = (
-        "CAST(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(coste,'€',''),'M€',''),'M',''),'m',''),' ','')"
-        ",',','.') AS REAL)"
+        "CAST(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(coste,'€',''),'M€',''),"
+        "'M',''),'m',''),' ','')"
+        " AS REAL)"
     )
 
     sql = f"""
@@ -164,7 +164,9 @@ def _sql_tabla_clasificacion(temp: Optional[str]):
             Puntos,
             Ganados,
             Empatados,
-            Perdidos
+            Perdidos,
+            GolesAF,
+            GolesEC
         FROM clasificaciones
         WHERE {where}
         ORDER BY Puntos DESC
@@ -173,210 +175,174 @@ def _sql_tabla_clasificacion(temp: Optional[str]):
     return sql, params, f"Top de la clasificación {temp or '(todas las temporadas)'}"
 
 
-# ==========================================
-# Soporte de PRONÓSTICO basado en histórico
-# ==========================================
+# ----------------- Helpers para PRONÓSTICOS ----------------------
 
-# Cache de clubes para mapear nombres escritos por el usuario
-_CLUB_CACHE: Optional[list[tuple[str, str]]] = None  # (nombre_original, nombre_normalizado)
-
-
-def _normalize_name(s: str) -> str:
+def _parse_match_from_question(q_low: str) -> Tuple[Optional[str], Optional[str]]:
     """
-    Normaliza nombres de clubes / texto:
-      - sin tildes
-      - minúsculas
-      - sin signos raros
-      - quita palabras muy genéricas (fc, cf, club, de, la...)
+    Saca 'equipo local' y 'equipo visitante' de frases tipo:
+    - 'pronostico real madrid vs fc barcelona 2025/2026 en el bernabeu'
+    - 'pronostico girona contra real oviedo 2025/2026'
+    MUY sencillo, pero suficiente para tu TFG.
     """
-    if s is None:
-        return ""
-    s = unicodedata.normalize("NFKD", s)
-    s = "".join(ch for ch in s if not unicodedata.combining(ch))
-    s = s.lower()
-    s = re.sub(r"[^a-z0-9ñ ]+", " ", s)
-    s = re.sub(r"\s+", " ", s).strip()
-    stop = {"fc", "cf", "sd", "cd", "ud", "club", "de", "la", "el", "club de futbol"}
-    tokens = [t for t in s.split() if t not in stop]
-    return " ".join(tokens) if tokens else s
+    sep = None
+    if " vs " in q_low:
+        sep = " vs "
+    elif " contra " in q_low:
+        sep = " contra "
+    if not sep:
+        return None, None
+
+    left, right = q_low.split(sep, 1)
+
+    # limpiamos palabras de la izquierda
+    for token in ["pronostico del partido", "pronostico", "del partido", "partido", "de", "el", "la"]:
+        left = left.replace(token, "")
+    home = left.strip()
+
+    # en la derecha, cortamos por temporada / estadio / etc
+    cortes = [" en ", " para ", " de la temporada", " temporada "]
+    cut_idx = len(right)
+    for c in cortes:
+        i = right.find(c)
+        if i != -1 and i < cut_idx:
+            cut_idx = i
+    away = right[:cut_idx].strip()
+
+    if not home or not away:
+        return None, None
+    return home, away
 
 
-def _load_club_cache() -> list[tuple[str, str]]:
+def _find_club_in_db(con: sqlite3.Connection, name_like: str) -> Optional[str]:
     """
-    Carga y cachea la lista de clubes distintos (clasificaciones + resultados)
-    con su versión normalizada.
+    Busca un club cuyo nombre contenga name_like (case-insensitive) en
+    clasificaciones y resultados. Devuelve el nombre tal cual está en la BD.
     """
-    global _CLUB_CACHE
-    if _CLUB_CACHE is not None:
-        return _CLUB_CACHE
+    pat = f"%{name_like.strip()}%"
+    cur = con.cursor()
 
-    con = sqlite3.connect(DB_PATH)
-    df = pd.read_sql_query(
-        """
-        SELECT DISTINCT Club AS nombre FROM clasificaciones
-        UNION
-        SELECT DISTINCT Local AS nombre FROM resultados
-        UNION
-        SELECT DISTINCT Visitante AS nombre FROM resultados
-        """,
-        con,
-    )
-    con.close()
-    cache: list[tuple[str, str]] = []
-    for raw in df["nombre"].dropna().unique():
-        raw = str(raw)
-        norm = _normalize_name(raw)
-        if norm:
-            cache.append((raw, norm))
-    _CLUB_CACHE = cache
-    return cache
+    # clasificaciones
+    for sql in [
+        "SELECT DISTINCT Club FROM clasificaciones WHERE Club LIKE ? LIMIT 1",
+        "SELECT DISTINCT Local AS Club FROM resultados WHERE Local LIKE ? LIMIT 1",
+        "SELECT DISTINCT Visitante AS Club FROM resultados WHERE Visitante LIKE ? LIMIT 1",
+    ]:
+        cur.execute(sql, (pat,))
+        row = cur.fetchone()
+        if row and row[0]:
+            return row[0]
+    return None
 
 
-def _find_teams_in_question(q: str) -> tuple[Optional[str], Optional[str]]:
+def _team_season_stats(con: sqlite3.Connection, club: str, temporada: Optional[str]) -> Dict[str, Any]:
     """
-    Intenta detectar los dos equipos mencionados en la pregunta
-    comparando contra la lista de clubes de la base de datos.
+    Devuelve un pequeño diccionario con stats de clasificaciones para ese club.
     """
-    norm_q = _normalize_name(q)
-    clubs = _load_club_cache()
-
-    hits: list[tuple[str, str]] = []  # (nombre_original, norm)
-    for orig, norm in clubs:
-        if norm and norm in norm_q:
-            hits.append((orig, norm))
-
-    # si encontramos más de dos, nos quedamos con los de nombre normalizado más largo
-    hits = sorted(hits, key=lambda x: len(x[1]), reverse=True)
-    if len(hits) >= 2:
-        return hits[0][0], hits[1][0]
-    if len(hits) == 1:
-        return hits[0][0], None
-    return None, None
-
-
-def _predict_match(pregunta: str, temporada: Optional[str]) -> dict:
-    """
-    Predicción tipo casa de apuestas basada en:
-      - histórico de enfrentamientos Local vs Visitante
-
-    Devuelve SOLO probabilidades 1-X-2 y un resumen textual.
-    """
-    q_low = pregunta.lower()
-    local_name, visit_name = _find_teams_in_question(q_low)
-
-    if not local_name or not visit_name:
-        return {
-            "ok": False,
-            "modo": "pronostico",
-            "pregunta": pregunta,
-            "error": "No pude identificar claramente los dos equipos en la pregunta.",
-        }
-
-    # Construimos consulta de histórico
-    where_parts = ["Local = ?", "Visitante = ?"]
-    params: list = [local_name, visit_name]
-
+    where = "Club = ?"
+    params: List[Any] = [club]
     if temporada:
-        where_parts.append(_clean_temporada_for_where("Temporada"))
+        where += f" AND {_clean_temporada_for_where('Temporada')}"
         params.append(temporada)
 
-    where_clause = " AND ".join(where_parts)
+    df = pd.read_sql_query(f"SELECT * FROM clasificaciones WHERE {where}", con, params=params)
+    if df.empty:
+        return {"club": club}
 
-    sql = f"""
-        SELECT
-          SUM(CASE WHEN GolesLocal > GolesVisitante THEN 1 ELSE 0 END) AS victorias_local,
-          SUM(CASE WHEN GolesLocal = GolesVisitante THEN 1 ELSE 0 END) AS empates,
-          SUM(CASE WHEN GolesLocal < GolesVisitante THEN 1 ELSE 0 END) AS victorias_visitante,
-          COUNT(*) AS total_partidos,
-          AVG(GolesLocal) AS media_goles_local,
-          AVG(GolesVisitante) AS media_goles_visitante
-        FROM resultados
-        WHERE {where_clause};
-    """
-
-    con = sqlite3.connect(DB_PATH)
-    cur = con.cursor()
-    cur.execute(sql, tuple(params))
-    row = cur.fetchone()
-    con.close()
-
-    if not row:
-        return {
-            "ok": False,
-            "modo": "pronostico",
-            "pregunta": pregunta,
-            "error": "No encontré histórico de enfrentamientos para ese partido.",
-        }
-
-    (
-        vict_local,
-        empates,
-        vict_visitante,
-        total_partidos,
-        media_gl,
-        media_gv,
-    ) = row
-
-    if not total_partidos or total_partidos == 0:
-        return {
-            "ok": False,
-            "modo": "pronostico",
-            "pregunta": pregunta,
-            "error": "No hay suficientes partidos históricos entre esos equipos.",
-        }
-
-    vict_local = vict_local or 0
-    empates = empates or 0
-    vict_visitante = vict_visitante or 0
-
-    p_local = vict_local / total_partidos
-    p_empate = empates / total_partidos
-    p_visitante = vict_visitante / total_partidos
-
-    resumen = (
-        f"Histórico {temporada or 'global'} en tu base local para {local_name} vs {visit_name}: "
-        f"{int(vict_local)} victorias locales, {int(empates)} empates y "
-        f"{int(vict_visitante)} victorias visitantes en {int(total_partidos)} partidos. "
-        f"Probabilidades estimadas → 1 (local): {p_local:.2%}, "
-        f"X (empate): {p_empate:.2%}, 2 (visitante): {p_visitante:.2%}."
-    )
-
+    row = df.iloc[0]
     return {
-        "ok": True,
-        "modo": "pronostico",
-        "pregunta": pregunta,
-        "partido": {
-            "temporada": temporada or "histórico",
-            "local": local_name,
-            "visitante": visit_name,
-        },
-        "historial": {
-            "total_partidos": int(total_partidos),
-            "victorias_local": int(vict_local),
-            "empates": int(empates),
-            "victorias_visitante": int(vict_visitante),
-            "media_goles_local": float(media_gl) if media_gl is not None else None,
-            "media_goles_visitante": float(media_gv) if media_gv is not None else None,
-        },
-        "probabilidades": {
-            "p_local": p_local,
-            "p_empate": p_empate,
-            "p_visitante": p_visitante,
-        },
-        "resumen": resumen,
-        "sql_usada": sql,
-        "parametros": params,
+        "club": club,
+        "temporada": row.get("Temporada"),
+        "puntos": int(row.get("Puntos", 0)),
+        "ganados": int(row.get("Ganados", 0)),
+        "empatados": int(row.get("Empatados", 0)),
+        "perdidos": int(row.get("Perdidos", 0)),
+        "goles_af": int(row.get("GolesAF", 0)),
+        "goles_ec": int(row.get("GolesEC", 0)),
     }
 
 
-# =========================
-# Router semántico
-# =========================
-
-def _pick_intent(q: str):
+def _build_prediction_context(pregunta: str) -> Dict[str, Any]:
     """
-    Devuelve qué tipo de info pide la pregunta (para consultas SQL normales).
-    Miramos palabras clave muy básicas.
+    Construye el contexto estadístico para un pronóstico:
+    - identifica equipos
+    - busca nombres reales en la BD
+    - saca stats de clasificaciones
+    """
+    q_low = pregunta.lower()
+    temporada = _guess_temporada(q_low)
+    home_raw, away_raw = _parse_match_from_question(q_low)
+    if not home_raw or not away_raw:
+        return {
+            "ok": False,
+            "intent": "prediction",
+            "error": "No pude extraer los equipos del texto.",
+        }
+
+    con = sqlite3.connect(DB_PATH)
+    try:
+        home_db = _find_club_in_db(con, home_raw) or home_raw.title()
+        away_db = _find_club_in_db(con, away_raw) or away_raw.title()
+
+        home_stats = _team_season_stats(con, home_db, temporada)
+        away_stats = _team_season_stats(con, away_db, temporada)
+
+        df = pd.DataFrame(
+            [
+                {
+                    "Club": home_stats.get("club"),
+                    "Temporada": home_stats.get("temporada", temporada or ""),
+                    "Puntos": home_stats.get("puntos", ""),
+                    "G": home_stats.get("ganados", ""),
+                    "E": home_stats.get("empatados", ""),
+                    "P": home_stats.get("perdidos", ""),
+                    "GF": home_stats.get("goles_af", ""),
+                    "GC": home_stats.get("goles_ec", ""),
+                },
+                {
+                    "Club": away_stats.get("club"),
+                    "Temporada": away_stats.get("temporada", temporada or ""),
+                    "Puntos": away_stats.get("puntos", ""),
+                    "G": away_stats.get("ganados", ""),
+                    "E": away_stats.get("empatados", ""),
+                    "P": away_stats.get("perdidos", ""),
+                    "GF": away_stats.get("goles_af", ""),
+                    "GC": away_stats.get("goles_ec", ""),
+                },
+            ]
+        )
+
+        context_md = _simple_table_text(df)
+        context_txt = (
+            f"Stats de la temporada {temporada or '(según datos disponibles)'}:\n"
+            f"- {home_stats.get('club')} → {home_stats.get('puntos', '?')} puntos, "
+            f"{home_stats.get('ganados', '?')}G-{home_stats.get('empatados', '?')}E-"
+            f"{home_stats.get('perdidos', '?')}P, GF {home_stats.get('goles_af', '?')}, "
+            f"GC {home_stats.get('goles_ec', '?')}.\n"
+            f"- {away_stats.get('club')} → {away_stats.get('puntos', '?')} puntos, "
+            f"{away_stats.get('ganados', '?')}G-{away_stats.get('empatados', '?')}E-"
+            f"{away_stats.get('perdidos', '?')}P, GF {away_stats.get('goles_af', '?')}, "
+            f"GC {away_stats.get('goles_ec', '?')}."
+        )
+
+        return {
+            "ok": True,
+            "intent": "prediction",
+            "home_team": home_db,
+            "away_team": away_db,
+            "temporada": temporada,
+            "context_markdown": context_md,
+            "context_text": context_txt,
+        }
+    finally:
+        con.close()
+
+
+# ----------------- Router semántico básico ------------------------
+
+def _pick_intent_for_stats(q: str):
+    """
+    Devuelve (sql, params, descripcion) según la intención
+    para consultas ESTADÍSTICAS (no pronósticos).
     """
     q_low = q.lower()
     temp = _guess_temporada(q_low)
@@ -390,51 +356,44 @@ def _pick_intent(q: str):
     if "fichaje" in q_low or "traspaso" in q_low or "transfer" in q_low:
         return _sql_top_fichajes(temp)
 
-    if "resultado" in q_low or "marcador" in q_low:
+    if "resultado" in q_low or "marcador" in q_low or "partido" in q_low:
         return _sql_resultados(temp)
 
     if "clasific" in q_low or "tabla" in q_low or "puntos" in q_low or "liga" in q_low:
         return _sql_tabla_clasificacion(temp)
 
-    # fallback: por defecto saco tabla de clasificación
+    # fallback: clasificación general
     return _sql_tabla_clasificacion(temp)
 
 
-# =========================
-# Entrada principal
-# =========================
+# ----------------- Función principal usada por FastAPI ------------
 
-def ask_rag(pregunta: str) -> dict:
+def ask_rag(pregunta: str) -> Dict[str, Any]:
     """
-    Recibe la pregunta en texto.
-    1. Si detecta que es un PRONÓSTICO → usa histórico de resultados.
-    2. Si no, detecta intención + construye SQL canónica.
-    3. Ejecuta.
-    4. Devuelve filas + mini resumen.
+    Entrada única desde FastAPI / ChatAgent.
+
+    - Si la pregunta es un PRONÓSTICO (contiene 'pronostic' y 'vs/contra'):
+      -> devuelve intent='prediction' + contexto para el LLM.
+    - Si es una consulta estadística:
+      -> ejecuta SQL y devuelve tabla + resumen.
     """
+    q = (pregunta or "").strip()
+    q_low = q.lower()
+
+    # 1) Pronósticos
+    if ("pronostic" in q_low or "resultado probable" in q_low) and (
+        " vs " in q_low or " contra " in q_low
+    ):
+        ctx = _build_prediction_context(q)
+        # nos aseguramos de marcar el intent
+        ctx.setdefault("intent", "prediction")
+        return ctx
+
+    # 2) Consultas estadísticas normales
     try:
-        q_low = (pregunta or "").lower()
-
-        # --- 1) Preguntas de pronóstico / probabilidad ---
-        if any(
-            w in q_low
-            for w in [
-                "pronostic",
-                "probabilidad",
-                "quien gana",
-                "quién gana",
-                "resultado probable",
-                "apuesta",
-            ]
-        ):
-            temp = _guess_temporada(q_low)
-            return _predict_match(pregunta, temp)
-
-        # --- 2) Consultas estándar tipo tabla / top / fichajes ---
-        sql, params, descripcion = _pick_intent(q_low)
+        sql, params, descripcion = _pick_intent_for_stats(q)
         cols, rows = _run_sql(sql, params)
 
-        # DataFrame para preview bonito
         df = pd.DataFrame(rows, columns=cols)
 
         if df.empty:
@@ -445,7 +404,7 @@ def ask_rag(pregunta: str) -> dict:
 
         return {
             "ok": True,
-            "modo": "sql",
+            "intent": "stats",
             "pregunta": pregunta,
             "descripcion": descripcion,
             "consulta": sql,
@@ -453,12 +412,12 @@ def ask_rag(pregunta: str) -> dict:
             "columnas": cols,
             "resultados": rows,
             "resumen": resumen,
-            "tabla_md": df.head(20).to_markdown(index=False) if not df.empty else "",
         }
 
     except Exception as e:
         return {
             "ok": False,
+            "intent": "stats",
             "pregunta": pregunta,
             "error": str(e),
         }
