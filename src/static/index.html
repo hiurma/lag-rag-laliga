@@ -124,9 +124,28 @@
 
         addMsg("🤖 " + (data.respuesta ?? "(sin respuesta)"), "bot");
 
-        if (data.tabla) {
-          addMsg("<pre>" + data.tabla + "</pre>", "bot");
-        }
+// Mostrar tabla si existe
+if (data.tabla) {
+  addMsg("<pre>" + data.tabla + "</pre>", "bot");
+}
+
+// Mostrar PRONÓSTICO si existe
+if (data.pronostico) {
+  const p = data.pronostico;
+  let block = "📊 <b>Pronóstico del partido</b><br><br>";
+
+  if (p.ganador_probable) {
+    block += "🏆 Ganador probable: <b>" + p.ganador_probable + "</b><br>";
+  }
+  if (p.marcador_estimado) {
+    block += "⚽ Marcador estimado: <b>" + p.marcador_estimado + "</b><br>";
+  }
+  if (p.comentario) {
+    block += "📝 Comentario: " + p.comentario + "<br>";
+  }
+
+  addMsg(block, "bot");
+}
 
       } catch (e) {
         addMsg("⚠️ Error llamando a la API: " + e.message, "bot");
