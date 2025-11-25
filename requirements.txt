@@ -16,4 +16,4 @@ beautifulsoup4>=4.12.2
 lxml>=5.2
 
 markdown>=3.4.4
-tabulate>=1.9.0
+tabulate
