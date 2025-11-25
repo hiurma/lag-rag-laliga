@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat LaLiga RAG</title>
-
   <style>
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -13,32 +12,57 @@
       display: flex;
       justify-content: center;
       padding: 30px;
+      margin: 0;
     }
     .chatbox {
       width: 100%;
-      max-width: 820px;
+      max-width: 900px;
       background: #151a22;
-      border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 6px 24px rgba(0,0,0,.35);
+      border-radius: 18px;
+      padding: 22px 22px 18px 22px;
+      box-shadow: 0 10px 32px rgba(0,0,0,.45);
+      border: 1px solid #202636;
     }
-    h1 { font-size: 20px; margin: 0 0 6px 0; }
-    .sub { opacity:.8; font-size: 13px; margin-bottom: 12px; }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h1::before {
+      content: "⚽";
+      font-size: 22px;
+    }
+    .sub {
+      opacity:.8;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
     .msgs {
       height: 420px;
       overflow-y: auto;
       background: #0f141c;
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 12px 14px;
       margin-bottom: 12px;
       border: 1px solid #202636;
     }
-    .msg { margin: 8px 0; line-height: 1.35; }
-    .me { color: #9cdcfe; }
-    .bot { color: #b5f5d1; }
+    .msg {
+      margin: 8px 0;
+      line-height: 1.4;
+      font-size: 14px;
+    }
+    .me {
+      color: #9cdcfe;
+    }
+    .bot {
+      color: #b5f5d1;
+    }
     .row {
       display: flex;
       gap: 8px;
+      margin-top: 6px;
     }
     input {
       flex: 1;
@@ -50,31 +74,53 @@
       font-size: 15px;
       outline: none;
     }
+    input::placeholder {
+      color: #64748b;
+    }
     button {
-      padding: 0 16px;
+      padding: 0 18px;
       border-radius: 10px;
       border: none;
-      background: #28a745;
+      background: #22c55e;
       color: white;
       font-weight: 700;
       cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 0 0 rgba(34,197,94,0);
+      transition: transform .05s ease-out, box-shadow .12s ease-out;
     }
-    button:disabled { opacity: .6; cursor: not-allowed; }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(34,197,94,.35);
+    }
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
     pre {
       white-space: pre-wrap;
-      background: #0b0f15;
+      background: #050810;
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #252c3e;
       margin-top: 6px;
+      font-size: 13px;
+      overflow-x: auto;
+    }
+    a {
+      color: #60a5fa;
     }
   </style>
 </head>
-
 <body>
   <div class="chatbox">
     <h1>Chat LaLiga RAG</h1>
-    <div class="sub">Pregúntame por la clasificación actual, títulos o fichajes.</div>
+    <div class="sub">
+      Pregúntame por la clasificación actual, títulos históricos, fichajes o
+      <b>pronósticos de partidos</b>.
+    </div>
 
     <div id="msgs" class="msgs"></div>
 
@@ -85,19 +131,37 @@
   </div>
 
   <script>
-    // 🔥 AHORA EL FRONT USA LA MISMA URL DEL SERVIDOR (Render)
-    const API_URL = "/chat";
+    // ✅ URL de tu API en Render
+    const API_URL = "https://lag-rag-api.onrender.com/chat";
 
     const msgs = document.getElementById("msgs");
     const q = document.getElementById("q");
     const send = document.getElementById("send");
 
-    function addMsg(text, cls) {
+    function addMsg(html, cls) {
       const div = document.createElement("div");
       div.className = "msg " + cls;
-      div.innerHTML = text;
+      div.innerHTML = html;
       msgs.appendChild(div);
       msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function renderPronostico(p) {
+      if (!p) return null;
+
+      let block = "📊 <b>Pronóstico del partido</b><br><br>";
+
+      if (p.ganador_probable) {
+        block += "🏆 Ganador probable: <b>" + p.ganador_probable + "</b><br>";
+      }
+      if (p.marcador_estimado) {
+        block += "⚽ Marcador estimado: <b>" + p.marcador_estimado + "</b><br>";
+      }
+      if (p.comentario) {
+        block += "📝 Comentario: " + p.comentario + "<br>";
+      }
+
+      return block;
     }
 
     async function ask() {
@@ -122,30 +186,19 @@
 
         const data = await res.json();
 
+        // Mensaje principal
         addMsg("🤖 " + (data.respuesta ?? "(sin respuesta)"), "bot");
 
-// Mostrar tabla si existe
-if (data.tabla) {
-  addMsg("<pre>" + data.tabla + "</pre>", "bot");
-}
+        // Tabla (clasificación, goleadores, etc.)
+        if (data.tabla) {
+          addMsg("<pre>" + data.tabla + "</pre>", "bot");
+        }
 
-// Mostrar PRONÓSTICO si existe
-if (data.pronostico) {
-  const p = data.pronostico;
-  let block = "📊 <b>Pronóstico del partido</b><br><br>";
-
-  if (p.ganador_probable) {
-    block += "🏆 Ganador probable: <b>" + p.ganador_probable + "</b><br>";
-  }
-  if (p.marcador_estimado) {
-    block += "⚽ Marcador estimado: <b>" + p.marcador_estimado + "</b><br>";
-  }
-  if (p.comentario) {
-    block += "📝 Comentario: " + p.comentario + "<br>";
-  }
-
-  addMsg(block, "bot");
-}
+        // 🟢 PRONÓSTICO (si viene del backend)
+        if (data.pronostico) {
+          const block = renderPronostico(data.pronostico);
+          if (block) addMsg(block, "bot");
+        }
 
       } catch (e) {
         addMsg("⚠️ Error llamando a la API: " + e.message, "bot");
@@ -159,7 +212,6 @@ if (data.pronostico) {
     q.addEventListener("keydown", (e) => {
       if (e.key === "Enter") ask();
     });
-
   </script>
 </body>
 </html>
