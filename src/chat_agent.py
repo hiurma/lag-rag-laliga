@@ -75,6 +75,31 @@ def _parse_match(q: str) -> Optional[tuple[str, str, Optional[str]]]:
     return None
 
 
+# Palabras que indican que la pregunta es “de datos” (SQL) y no small-talk
+SQL_HINTS = [
+    "liga",
+    "clasific",
+    "tabla",
+    "pichichi",
+    "goleador",
+    "goles",
+    "fichaje",
+    "traspaso",
+    "transfer",
+    "valor",
+    "club",
+    "resultado",
+    "marcador",
+    "jornada",
+    "puntos",
+]
+
+
+def _is_data_question(q: str) -> bool:
+    q_low = q.lower()
+    return any(k in q_low for k in SQL_HINTS)
+
+
 # ------------------------------- Agente --------------------------------------
 
 
@@ -139,7 +164,34 @@ class ChatAgent:
                     "respuesta": f"No pude calcular el pronóstico: {e}",
                 }
 
-        # 2) Resto de preguntas → BD local (RAG SQL)
+        # 2) Si NO parece una pregunta de datos → small talk / LLM
+        if not _is_data_question(q):
+            # Si no hay LLM configurado, contesta algo genérico
+            if not self.client:
+                return {
+                    "mode": "llm",
+                    "respuesta": "(LLM no configurado) Dime qué necesitas de LaLiga.",
+                }
+            try:
+                comp = self.client.chat.completions.create(
+                    model=self.openai_model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "Eres un asistente sobre LaLiga, amable y breve.",
+                        },
+                        {"role": "user", "content": q},
+                    ],
+                )
+                text = (comp.choices[0].message.content or "").strip()
+                return {"mode": "llm", "respuesta": text}
+            except Exception as e:
+                return {
+                    "mode": "llm",
+                    "respuesta": f"(Error LLM: {e})",
+                }
+
+        # 3) Preguntas de datos → BD local (RAG SQL)
         try:
             res = ask_rag(q)
             if not res.get("ok"):
