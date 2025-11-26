@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 import os
 from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import pandas as pd
 
@@ -41,6 +44,18 @@ app.add_middleware(
 
 agent = ChatAgent()
 
+STATIC_DIR = os.path.join(CURRENT_DIR, "static")
+INDEX_FILE = os.path.join(STATIC_DIR, "index.html")
+logger = logging.getLogger(__name__)
+
+if not os.path.isdir(STATIC_DIR):
+    logger.warning("Static directory not found at %s; landing page won't load.", STATIC_DIR)
+if not os.path.isfile(INDEX_FILE):
+    logger.warning("Landing page missing at %s; root will return an error.", INDEX_FILE)
+
+if os.path.isdir(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 
 class ChatBody(BaseModel):
     pregunta: str
@@ -48,10 +63,10 @@ class ChatBody(BaseModel):
 
 @app.get("/")
 def root():
-    return {
-        "message": "LaLiga RAG API está viva.",
-        "endpoints": ["/health", "/chat"],
-    }
+    if os.path.isfile(INDEX_FILE):
+        return FileResponse(INDEX_FILE)
+
+    raise HTTPException(status_code=500, detail="Landing page no encontrada en el servidor")
 
 
 @app.get("/health")
