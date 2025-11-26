@@ -289,7 +289,57 @@ class ChatAgent:
             system="Eres un asistente de fútbol: breve, claro y útil.",
             user=q or "Hola",
         )
+    def _extract_match(text: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
 
+        original_text = text.lower().strip()
+
+    # 1) Detectar temporada
+        season = _extract_season(original_text)
+
+    # 2) Lista de palabras basura
+        stopwords = [
+            "pronostico", "pronóstico", "prediccion", "predicción",
+            "resultado", "partido", "jornada", "del", "vs", "versus",
+            "de la", "de", "temporada", "para", "el", "la", "en",
+            "dame", "hazme", "quiero", "pronostica"
+        ]
+
+        clean = original_text
+
+        # 3) Quitar temporada del texto
+        if season:
+            clean = clean.replace(season.lower(), "")
+
+        # 4) Eliminar palabras basura
+        for w in stopwords:
+            clean = clean.replace(w, " ")
+
+            clean = re.sub(r"\s+", " ", clean).strip()
+        # 5) Regex para capturar el partido
+        pattern = r"(.+?)\s+(?:vs\.?|contra|frente a|-|vs)\s+(.+)$"
+        m = re.search(pattern, clean, re.IGNORECASE)
+
+        if not m:
+            return None, None, season
+
+        home = m.group(1).strip()
+        away = m.group(2).strip()
+
+        # 6) ✨ SUPER-FILTRO DE SEGURIDAD ✨
+        # Nunca devolver cadenas que empiecen por "pronostico", "prediccion", etc.
+        bad_prefixes = ["pronostico", "pronóstico", "prediccion", "predicción"]
+
+        def clean_name(t):
+            t = t.strip()
+            for b in bad_prefixes:
+                if t.startswith(b):
+                    t = t.replace(b, "").strip()
+            return t
+
+        home = clean_name(home)
+        away = clean_name(away)
+
+        return home, away, season
     # ----------------------------------------------------------------
     # PRONÓSTICO: modelo Poisson real con datos de tu BD
     # ----------------------------------------------------------------
