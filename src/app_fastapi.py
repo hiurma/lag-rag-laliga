@@ -72,3 +72,41 @@ def chat_endpoint(body: ChatRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+   
+   
+    # --- app_fastapi.py ------------------------------------------------
+
+
+# Dominios permitidos (tu GitHub Pages + comodín por si acaso)
+origins: List[str] = [
+    "https://hiurma.github.io",
+    "https://hiurma.github.io/",
+    "https://hiurma.github.io/laliga-chat-web",
+    "https://hiurma.github.io/laliga-chat-web/",
+    "*",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,   # si lo quieres súper estricto, quita "*"
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class ChatBody(BaseModel):
+    pregunta: str
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
+@app.post("/chat")
+async def chat_endpoint(body: ChatBody):
+    q = (body.pregunta or "").strip()
+    if not q:
+        raise HTTPException(status_code=400, detail="La 'pregunta' no puede estar vacía")
+    return agent.chat_query(q)
