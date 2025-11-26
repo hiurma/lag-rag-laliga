@@ -1,327 +1,231 @@
+# -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import os
-import re
-from typing import Any, Dict, Optional
-
+import os, re, sqlite3
 import pandas as pd
+from typing import Any, Dict, Optional, Tuple, List
 
-from rag_sql import ask_rag
-from poisson_model import predict_match_poisson
+# --- RAG web ya existente (clasificación/títulos) ---
+from web_rag import fetch_standings_espn, fetch_laliga_titles_wikipedia
 
-# Web RAG (ESPN / Wikipedia) – si fallan, hacemos fallback a LLM o SQL
-try:
-    from web_rag import fetch_standings_espn, fetch_laliga_titles_wikipedia
-except Exception:  # si no existe el módulo en Render no pasa nada
-    def fetch_standings_espn():
-        raise RuntimeError("web_rag.fetch_standings_espn no disponible")
+# --- Poisson y normalizador de nombres ---
+from poisson_model import predict_match_poisson, bulk_predict_rm
+from names import canon_team
 
-    def fetch_laliga_titles_wikipedia():
-        raise RuntimeError("web_rag.fetch_laliga_titles_wikipedia no disponible")
-
-
-# LLM opcional
+# --- LLM opcional ---
 try:
     from openai import OpenAI
 except Exception:
     OpenAI = None
 
-
-# ---------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------
 def _md_table(df: pd.DataFrame, max_rows: int = 20) -> str:
     if df is None or df.empty:
         return "(sin filas)"
     try:
-        # to_markdown necesita tabulate, por si acaso hacemos fallback
         return df.head(max_rows).to_markdown(index=False)
     except Exception:
         return "\n" + df.head(max_rows).to_string(index=False) + "\n"
 
-
 def _extract_season(text: str) -> Optional[str]:
     m = re.search(r"(20\d{2})\s*[-/]\s*(20\d{2})", text)
-    if m:
-        return f"{m.group(1)}/{m.group(2)}"
-    return None
+    return f"{m.group(1)}/{m.group(2)}" if m else None
 
+# ----------------- parse "Pronóstico A vs B ..." -----------------
 
-# ---------------------------------------------------------------------
-# ChatAgent
-# ---------------------------------------------------------------------
+MATCH_RE = re.compile(
+    r"(?:pronost[aí]co|predicci[oó]n)\s+([a-z0-9 .\-_/áéíóúñ]+?)\s+vs\.?\s+([a-z0-9 .\-_/áéíóúñ]+?)(?:\s+(20\d{2}[/\-]20\d{2}))?$",
+    re.I
+)
+
+def _parse_match_query(q: str) -> Optional[Tuple[str,str,Optional[str]]]:
+    m = MATCH_RE.search(q)
+    if not m:
+        return None
+    a = m.group(1).strip()
+    b = m.group(2).strip()
+    s = _extract_season(q) or (m.group(3).strip() if m.group(3) else None)
+    return a,b,s
+
+# ----------------- ChatAgent -----------------
+
 class ChatAgent:
     def __init__(self) -> None:
+        self.client = None
         api_key = os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_APIKEY")
-        self.client = OpenAI(api_key=api_key) if (OpenAI and api_key) else None
+        if OpenAI and api_key:
+            self.client = OpenAI(api_key=api_key)
         self.openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-    # --------------------------------------------------------------
+    # ---------- helpers contexto LLM ----------
+    def _contexto_llm(self, season: str, home: str, away: str, pred: Dict) -> str:
+        """
+        Genera 3-4 frases de contexto: forma reciente (últimos 5), media de goles, punto táctico.
+        Si no hay LLM, devuelve un texto heurístico.
+        """
+        # Stats rápidas desde resultados (últimos 5 de cada uno)
+        con = sqlite3.connect("data/laliga.sqlite")
+        sql = """
+        SELECT Jornada, Local, Visitante, GolesLocal, GolesVisitante
+        FROM resultados
+        WHERE REPLACE(TRIM(Temporada),'-','/') = REPLACE(TRIM(?),'-','/')
+          AND (Local=? OR Visitante=?)
+          AND GolesLocal IS NOT NULL AND GolesVisitante IS NOT NULL
+        ORDER BY Jornada DESC
+        LIMIT 10
+        """
+        df = pd.read_sql_query(sql, con, params=[season, home, home])
+        df2 = pd.read_sql_query(sql, con, params=[season, away, away])
+        con.close()
+
+        def _mini(df: pd.DataFrame) -> Dict:
+            if df.empty:
+                return {"pj":0,"gf":0,"ga":0,"prom":0.0}
+            pj = len(df)
+            gf = int((df["GolesLocal"]*(df["Local"]==home)).sum() + (df["GolesVisitante"]*(df["Visitante"]==home)).sum())
+            ga = int((df["GolesVisitante"]*(df["Local"]==home)).sum() + (df["GolesLocal"]*(df["Visitante"]==home)).sum())
+            prom = (gf+ga)/max(1,pj)
+            return {"pj":pj,"gf":gf,"ga":ga,"prom":round(prom,2)}
+
+        h = _mini(df)
+        a = _mini(df2)
+
+        base_bullets = (
+            f"- λ esperadas: {home} {pred['lambda_home']} vs {away} {pred['lambda_away']}. "
+            f"1X2: {pred['p_home']}-{pred['p_draw']}-{pred['p_away']}.\n"
+            f"- Últimos {h['pj']} del {home}: {h['gf']}-{h['ga']} (media {h['prom']} g/p). "
+            f"Últimos {a['pj']} del {away}: {a['gf']}-{a['ga']} (media {a['prom']} g/p)."
+        )
+
+        if not self.client:
+            return ("Contexto (heurístico):\n" + base_bullets)
+
+        prompt = f"""
+        Eres un analista de fútbol. Con los datos siguientes, escribe 3-5 frases concisas,
+        neutrales y útiles sobre el partido {home} vs {away} de la temporada {season}.
+        Incorpora el pronóstico Poisson, la tendencia de goles y un punto táctico general.
+
+        {base_bullets}
+        """
+
+        try:
+            comp = self.client.chat.completions.create(
+                model=self.openai_model,
+                messages=[
+                    {"role":"system","content":"Eres un analista deportivo objetivo y claro."},
+                    {"role":"user","content":prompt},
+                ],
+                temperature=0.3,
+            )
+            return comp.choices[0].message.content.strip()
+        except Exception as e:
+            return "Contexto (LLM no disponible): " + base_bullets + f" [{e}]"
+
+    # ------------------------- entrada principal -------------------------
+
     def chat_query(self, question: str) -> Dict[str, Any]:
         q = (question or "").strip()
         q_low = q.lower()
-        season = _extract_season(q_low)
+        season = _extract_season(q_low) or "2025/2026"
 
-        # 1) Pronósticos de partidos (Poisson)
-        if any(k in q_low for k in ["pronostic", "pronóstico", "predic", "resultado del partido"]):
-            return self._handle_prediction(q)
+        # 1) Pronóstico concreto (Poisson) — permitimos CUALQUIER rival,
+        #    pero para tu TFG lo usaremos sobre todo con el Madrid.
+        m = _parse_match_query(q_low)
+        if m:
+            home_raw, away_raw, s2 = m
+            season_use = s2 or season
+            home = canon_team(home_raw)
+            away = canon_team(away_raw)
 
-        # 2) Resumen / “cómo va la liga”
+            # estimamos fuerzas SOLO con lo jugado hasta jornada 8 (tu DB)
+            try:
+                pred = predict_match_poisson(season_use, home, away, upto_matchday=8)
+                ctx = self._contexto_llm(season_use, home, away, pred)
+                texto = (
+                    f"**Pronóstico Poisson** {season_use}: **{pred['score_mas_probable']}**\n"
+                    f"Prob. 1X2 → 1={pred['p_home']:.2f}  X={pred['p_draw']:.2f}  2={pred['p_away']:.2f}\n"
+                    f"{ctx}"
+                )
+                return {"mode":"pred", "respuesta": texto, "meta": pred}
+            except Exception as e:
+                return {"mode":"pred", "respuesta": f"No pude calcular el Poisson: {e}"}
+
+        # 2) Pronósticos RM “hasta hoy” (bloque)  → detecta “hasta hoy”, “hasta la jornada X”
+        if "hasta hoy" in q_low or ("hasta la jornada" in q_low and "real madrid" in q_low):
+            # intenta detectar jornada actual por web; si falla, usa 38
+            try:
+                _, meta = fetch_standings_espn()
+                j_act = int(meta.get("matchday") or meta.get("jornada") or 38)
+            except Exception:
+                j_act = 38
+            try:
+                dfp = bulk_predict_rm(season, 9, j_act, upto_matchday_for_fit=8)
+                if dfp.empty:
+                    return {"mode":"pred","respuesta":"No encuentro calendario del Real Madrid en tu DB para esas jornadas."}
+                return {
+                    "mode":"pred",
+                    "respuesta": f"Pronósticos Real Madrid (Poisson con datos hasta J8) {season}:\n\n" + _md_table(dfp, 50),
+                }
+            except Exception as e:
+                return {"mode":"pred","respuesta": f"No pude generar la tanda de pronósticos: {e}"}
+
+        # ----------------- rutas generales que ya tenías -----------------
+
         if any(k in q_low for k in ["resumen", "analiza", "cómo va la liga", "como va la liga"]):
-            return self._handle_clasificacion_resumen(q, season)
+            try:
+                df, meta = fetch_standings_espn()
+                tabla_md = _md_table(df)
+                # resumen con LLM si está disponible (opcional)
+                if self.client and not df.empty:
+                    try:
+                        prompt = f"Resume en 3-4 frases la clasificación: {tabla_md}"
+                        comp = self.client.chat.completions.create(
+                            model=self.openai_model,
+                            messages=[
+                                {"role":"system","content":"Eres un periodista deportivo conciso."},
+                                {"role":"user","content":prompt},
+                            ],
+                            temperature=0.2,
+                        )
+                        txt = comp.choices[0].message.content.strip()
+                    except Exception:
+                        txt = "(No pude generar resumen LLM)."
+                else:
+                    txt = "(Resumen LLM no configurado)."
+                return {"mode":"web","respuesta":txt,"tabla":tabla_md,"meta":meta}
+            except Exception as e:
+                return {"mode":"llm","respuesta":f"(Error al obtener clasificación: {e})"}
 
-        # 3) Clasificación directa
-        if any(k in q_low for k in ["clasific", "tabla", "posiciones", "standings"]):
-            return self._handle_clasificacion_tabla(q, season)
+        if any(k in q_low for k in ["clasificación","clasificacion","tabla","posiciones","standings"]):
+            try:
+                df, meta = fetch_standings_espn()
+                return {"mode":"web","respuesta":f"Clasificación LaLiga (fuente: {meta.get('source','espn')})","tabla":_md_table(df),"meta":meta}
+            except Exception as e:
+                return {"mode":"llm","respuesta":f"(No pude obtener la clasificación: {e})"}
 
-        # 4) Palmarés / títulos históricos
-        if any(
-            k in q_low
-            for k in ["títulos", "titulos", "palmarés", "palmares", "ligas ganadas", "mas ligas", "más ligas"]
-        ):
-            return self._handle_titulos(q)
+        if any(k in q_low for k in ["títulos","titulos","palmarés","palmares","más ligas","mas ligas","ligas ganadas","campeonatos"]):
+            try:
+                titles_df, cite_url = fetch_laliga_titles_wikipedia()
+                return {
+                    "mode":"web",
+                    "respuesta": f"Títulos históricos por club (Wikipedia). Fuente: {cite_url}",
+                    "tabla": _md_table(titles_df, 30),
+                    "meta": {"source":"wikipedia","url":cite_url}
+                }
+            except Exception as e:
+                return {"mode":"llm","respuesta":f"(No pude extraer palmarés: {e})"}
 
-        # 5) Preguntas sobre datos históricos (pichichi, fichajes, valor, etc.) → RAG SQL
-        if any(k in q_low for k in ["pichichi", "goleador", "fichaje", "traspaso", "transfer", "valor"]):
-            return self._handle_sql_rag(q)
-
-        # 6) Resto → LLM directo
-        return self._fallback_llm(
-            system="Eres un asistente experto en fútbol español (LaLiga). Responde breve, claro y útil.",
-            user=q or "Hola",
-        )
-
-    # --------------------------------------------------------------
-    # Handlers
-    # --------------------------------------------------------------
-    def _handle_clasificacion_resumen(self, q: str, season: Optional[str]) -> Dict[str, Any]:
-        try:
-            df, meta = fetch_standings_espn()
-            txt = self._summarize_standings_with_llm(
-                df,
-                season,
-                meta.get("source", "espn"),
-            )
-            return {
-                "mode": "web",
-                "respuesta": txt,
-                "tabla": _md_table(df),
-                "meta": meta,
-            }
-        except Exception as e:
-            # Fallback: explicación genérica
-            return self._fallback_llm(
-                system="Eres un periodista deportivo experto en LaLiga.",
-                user=(
-                    f"No pude obtener la clasificación en vivo para hacer el resumen ({e}). "
-                    "Explica al usuario cómo consultar la tabla actual y cómo se interpreta "
-                    "la clasificación (puestos europeos, descenso, etc.)."
-                ),
-            )
-
-    def _handle_clasificacion_tabla(self, q: str, season: Optional[str]) -> Dict[str, Any]:
-        # Primero intentamos ESPN (web)
-        try:
-            df, meta = fetch_standings_espn()
-            return {
-                "mode": "web",
-                "respuesta": f"Clasificación LaLiga {season or '(actual)'} (fuente: {meta.get('source', 'espn')}).",
-                "tabla": _md_table(df),
-                "meta": meta,
-            }
-        except Exception:
-            # Si falla, tiramos de base local (rag_sql)
-            rag = ask_rag(q)
-            if not rag.get("ok"):
-                return self._fallback_llm(
-                    system="Eres un asistente de fútbol.",
-                    user=(
-                        "No he podido obtener la clasificación ni en web ni en la base local. "
-                        "Explica al usuario cómo puede consultarla en internet de forma fiable."
-                    ),
+        # fallback genérico
+        if self.client:
+            try:
+                comp = self.client.chat.completions.create(
+                    model=self.openai_model,
+                    messages=[
+                        {"role":"system","content":"Eres un asistente de fútbol: breve, claro y útil."},
+                        {"role":"user","content": q or "Hola"},
+                    ],
                 )
+                return {"mode":"llm","respuesta":(comp.choices[0].message.content or "").strip()}
+            except Exception as e:
+                return {"mode":"llm","respuesta":f"(Error LLM: {e})"}
 
-            df = pd.DataFrame(rag["resultados"], columns=rag["columnas"])
-            return {
-                "mode": "sql",
-                "respuesta": rag["resumen"],
-                "tabla": _md_table(df),
-                "meta": {"fuente": "sqlite"},
-            }
-
-    def _handle_titulos(self, q: str) -> Dict[str, Any]:
-        try:
-            titles_df, cite_url = fetch_laliga_titles_wikipedia()
-
-            title_col = None
-            if "Títulos" in titles_df.columns:
-                title_col = "Títulos"
-            elif "Titulos" in titles_df.columns:
-                title_col = "Titulos"
-            else:
-                title_col = next(
-                    (c for c in titles_df.columns if "titul" in c.lower()),
-                    None,
-                )
-
-            resumen_extra = ""
-            q_low = q.lower()
-            ask_rm = ("real madrid" in q_low) or (" madrid" in q_low)
-            ask_fcb = ("barcelona" in q_low) or ("fc barcelona" in q_low)
-
-            if title_col:
-                club_col = next(
-                    (c for c in titles_df.columns if c.lower() in ("club", "equipo", "team")),
-                    None,
-                )
-                if club_col:
-                    t = titles_df.copy()
-                    t["club_lc"] = t[club_col].astype(str).str.lower()
-
-                    def _get_titles(mask):
-                        vals = t.loc[mask, title_col]
-                        if vals.empty:
-                            return 0
-                        try:
-                            return int(vals.max())
-                        except Exception:
-                            return int(pd.to_numeric(vals, errors="coerce").fillna(0).max())
-
-                    if ask_rm or ask_fcb:
-                        rm = _get_titles(t["club_lc"].str.contains("madrid", na=False))
-                        fcb = _get_titles(t["club_lc"].str.contains("barcelona", na=False))
-                        ganador = "Real Madrid" if rm >= fcb else "FC Barcelona"
-                        resumen_extra = f"\n\nComparativa → Real Madrid: {rm} ligas | FC Barcelona: {fcb} ligas. Más títulos: {ganador}."
-
-            return {
-                "mode": "web",
-                "respuesta": (
-                    "Títulos históricos de LaLiga por club (fuente: Wikipedia).\n"
-                    f"Fuente original: {cite_url}{resumen_extra}"
-                ),
-                "tabla": _md_table(titles_df, 30),
-                "meta": {"source": "wikipedia", "url": cite_url},
-            }
-        except Exception:
-            return self._fallback_llm(
-                system="Eres un asistente de fútbol.",
-                user=(
-                    "No pude extraer la tabla de títulos por club en Wikipedia. "
-                    "Resume qué clubes tienen más ligas y cómo comprobarlo con enlaces fiables."
-                ),
-            )
-
-    def _handle_sql_rag(self, q: str) -> Dict[str, Any]:
-        rag = ask_rag(q)
-        if not rag.get("ok"):
-            return {
-                "mode": "sql",
-                "respuesta": f"No pude responder con la base local: {rag.get('error')}",
-            }
-        df = pd.DataFrame(rag["resultados"], columns=rag["columnas"])
-        return {
-            "mode": "sql",
-            "respuesta": rag["resumen"],
-            "tabla": _md_table(df),
-            "meta": {"fuente": "sqlite"},
-        }
-
-    def _handle_prediction(self, q: str) -> Dict[str, Any]:
-        q_low = q.lower()
-
-        # Muy simple: buscamos "equipo1 vs equipo2"
-        m = re.search(r"(.+?)\s+vs\s+(.+)", q_low)
-        if not m:
-            return self._fallback_llm(
-                system="Eres un analista de fútbol.",
-                user=(
-                    "El usuario quiere un pronóstico de partido pero no detecto bien los equipos. "
-                    "Explícale que use formato 'Pronóstico Real Madrid vs FC Barcelona 2025/2026'. "
-                    f"Pregunta original: {q}"
-                ),
-            )
-
-        home_raw = m.group(1).strip()
-        away_raw = m.group(2).strip()
-
-        try:
-            pred = predict_match_poisson(home_raw, away_raw)
-        except Exception as e:
-            # Si no se encuentran equipos en la BD o cualquier otra cosa
-            return self._fallback_llm(
-                system="Eres un analista de fútbol. No inventes datos históricos concretos.",
-                user=(
-                    f"No he podido calcular un pronóstico Poisson para '{q}'. "
-                    f"El error técnico fue: {e}. Da un análisis cualitativo del partido, "
-                    "hablando de estilos de juego, factores clave, etc., pero sin fingir que "
-                    "has usado estadísticas exactas de goles."
-                ),
-            )
-
-        score = pred["marcador_mas_probable"]
-        probs = pred["probabilidades_1X2"]
-        equipos = pred["equipos_resueltos"]
-
-        texto = (
-            f"Pronóstico Poisson (usando tu base de datos histórica):\n\n"
-            f"- Partido: {equipos['local']} vs {equipos['visitante']}\n"
-            f"- Marcador más probable: {score['local']}–{score['visitante']}\n"
-            f"- Prob. victoria local:  {probs['local']*100:0.1f}%\n"
-            f"- Prob. empate:          {probs['empate']*100:0.1f}%\n"
-            f"- Prob. victoria visitante: {probs['visitante']*100:0.1f}%\n\n"
-            f"Goles esperados (xG aproximados): "
-            f"{pred['xg_local']:0.2f} para el local, {pred['xg_visitante']:0.2f} para el visitante."
-        )
-
-        return {
-            "mode": "poisson",
-            "respuesta": texto,
-            "meta": pred,
-        }
-
-    # --------------------------------------------------------------
-    # LLM helpers
-    # --------------------------------------------------------------
-    def _summarize_standings_with_llm(
-        self, df: pd.DataFrame, season: Optional[str], source: str
-    ) -> str:
-        if df is None or df.empty:
-            return "(No hay datos disponibles para resumir.)"
-
-        if not self.client:
-            return "(LLM no configurado para generar el resumen, pero la tabla se ha obtenido correctamente.)"
-
-        try:
-            tabla_txt = df.head(10).to_string(index=False)
-            prompt = (
-                f"Resume brevemente la clasificación de LaLiga {season or 'actual'}, "
-                f"destacando líder, puestos europeos y descenso. Fuente: {source}.\n\n"
-                f"Tabla (primeros 10):\n{tabla_txt}"
-            )
-            comp = self.client.chat.completions.create(
-                model=self.openai_model,
-                messages=[
-                    {"role": "system", "content": "Eres un periodista deportivo experto en LaLiga."},
-                    {"role": "user", "content": prompt},
-                ],
-            )
-            return (comp.choices[0].message.content or "").strip()
-        except Exception as e:
-            return f"(Error al generar resumen: {e})"
-
-    def _fallback_llm(self, system: str, user: str) -> Dict[str, Any]:
-        if not self.client:
-            return {"mode": "llm", "respuesta": user}
-
-        try:
-            comp = self.client.chat.completions.create(
-                model=self.openai_model,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-            )
-            text = (comp.choices[0].message.content or "").strip()
-            return {"mode": "llm", "respuesta": text}
-        except Exception as e:
-            return {"mode": "llm", "respuesta": f"(Error LLM: {e})"}
+        return {"mode":"llm","respuesta":"(LLM no configurado) Dime qué necesitas de LaLiga."}
