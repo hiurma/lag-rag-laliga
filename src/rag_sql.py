@@ -23,10 +23,35 @@ def _run_sql(sql: str, params: tuple = ()) -> Tuple[List[str], List[tuple]]:
     return cols, rows[:10]
 
 
+def _get_last_season() -> Optional[str]:
+    """
+    Devuelve la última temporada disponible en la BD (clasificaciones),
+    por ejemplo '2025/2026'.
+    """
+    try:
+        con = sqlite3.connect(DB_PATH)
+        cur = con.cursor()
+        row = cur.execute("SELECT MAX(Temporada) FROM clasificaciones").fetchone()
+        con.close()
+        if row and row[0]:
+            return row[0]
+    except Exception:
+        return None
+    return None
+
+
 def _guess_temporada(q: str) -> Optional[str]:
-    m = re.search(r"(20\d{2})\s*[-/]\s*(20\d{2})", q)
+    q_low = q.lower()
+
+    # 1) Si viene explícita en el texto
+    m = re.search(r"(20\d{2})\s*[-/]\s*(20\d{2})", q_low)
     if m:
         return f"{m.group(1)}/{m.group(2)}"
+
+    # 2) Si dice "actual", "ahora", "esta temporada" → última temporada en BD
+    if any(k in q_low for k in ["actual", "ahora", "esta temporada", "hoy"]):
+        return _get_last_season()
+
     return None
 
 
@@ -156,13 +181,13 @@ def _pick_intent(q: str):
     if "fichaje" in q_low or "traspaso" in q_low or "transfer" in q_low:
         return _sql_top_fichajes(temp)
 
-    if "resultado" in q_low or "marcador" in q_low:
+    if "resultado" in q_low or "marcador" in q_low or "partido" in q_low:
         return _sql_resultados(temp)
 
     if "clasific" in q_low or "tabla" in q_low or "puntos" in q_low or "liga" in q_low:
         return _sql_tabla_clasificacion(temp)
 
-    # fallback: clasificación
+    # fallback: clasificación (última temporada si podemos)
     return _sql_tabla_clasificacion(temp)
 
 
