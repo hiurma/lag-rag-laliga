@@ -1,135 +1,197 @@
-import os
+from __future__ import annotations
+
+import re
 import sqlite3
 from pathlib import Path
-import re
+from typing import List, Tuple, Dict, Any, Optional
+
 import pandas as pd
 
 DB_PATH = Path("data/laliga.sqlite")
 
-# ----------------------------------------------------
-# SQL helper
-# ----------------------------------------------------
-def _run_sql(sql: str, params: tuple = ()):
+
+# ---------------------------------------------------------------------
+# Helpers básicos
+# ---------------------------------------------------------------------
+def _run_sql(sql: str, params: tuple = ()) -> Tuple[List[str], List[tuple]]:
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute(sql, params)
     cols = [c[0] for c in cur.description]
     rows = cur.fetchall()
     con.close()
-    return cols, rows
+    return cols, rows[:10]
 
-# ----------------------------------------------------
-# Detecta temporada en texto
-# ----------------------------------------------------
-def _guess_temporada(text: str):
-    m = re.search(r"(20\d{2})[\/-](20\d{2})", text)
+
+def _guess_temporada(q: str) -> Optional[str]:
+    m = re.search(r"(20\d{2})\s*[-/]\s*(20\d{2})", q)
     if m:
         return f"{m.group(1)}/{m.group(2)}"
     return None
 
-def _norm_team(t):
-    return (t or "").lower().replace("fc ", "").replace("cd ", "").strip()
 
-# ----------------------------------------------------
-# Motor de pronóstico
-# ----------------------------------------------------
-def _predict_match(local: str, visitante: str, temporada: str | None):
-    """
-    Genera predicción solo si la base de datos tiene datos de goles, forma,
-    o resultados históricos entre ambos equipos.
-    """
-    local_n = _norm_team(local)
-    vis_n = _norm_team(visitante)
+def _clean_temporada_for_where(colname: str) -> str:
+    return f"REPLACE(TRIM({colname}), '-', '/') = REPLACE(TRIM(?), '-', '/')"
 
-    # Buscar historial entre ambos equipos
-    sql = """
-        SELECT Local, Visitante, Marcador
+
+# ---------------------------------------------------------------------
+# Plantillas SQL
+# ---------------------------------------------------------------------
+def _sql_top_goleadores(temp: Optional[str]):
+    where = "1=1"
+    params: tuple = ()
+    if temp:
+        where = _clean_temporada_for_where("Temporada")
+        params = (temp,)
+    sql = f"""
+        SELECT
+            Jugador,
+            Club,
+            MAX(Goles) AS Goles
+        FROM goleadores
+        WHERE {where}
+        GROUP BY Jugador, Club
+        ORDER BY Goles DESC
+        LIMIT 10;
+    """
+    return sql, params, f"Top goleadores {temp or '(todas las temporadas)'}"
+
+
+def _sql_top_valor_clubes(temp: Optional[str]):
+    where = "1=1"
+    params: tuple = ()
+    if temp:
+        where = _clean_temporada_for_where("Temporada")
+        params = (temp,)
+
+    sql = f"""
+        SELECT
+            Club,
+            MAX(Valor) AS Valor
+        FROM valor_clubes
+        WHERE {where}
+        GROUP BY Club
+        ORDER BY Valor DESC
+        LIMIT 10;
+    """
+    return sql, params, f"Clubes con más valor {temp or '(todas las temporadas)'}"
+
+
+def _sql_top_fichajes(temp: Optional[str]):
+    where = "1=1"
+    params: tuple = ()
+    if temp:
+        where = _clean_temporada_for_where("Temporada")
+        params = (temp,)
+
+    sql = f"""
+        SELECT
+            Club,
+            fichaje AS Fichaje,
+            coste AS Coste
+        FROM fichajes
+        WHERE {where}
+        ORDER BY Coste DESC
+        LIMIT 10;
+    """
+    return sql, params, f"Fichajes más caros {temp or '(todas las temporadas)'}"
+
+
+def _sql_resultados(temp: Optional[str]):
+    where = "1=1"
+    params: tuple = ()
+    if temp:
+        where = _clean_temporada_for_where("Temporada")
+        params = (temp,)
+
+    sql = f"""
+        SELECT
+            Jornada,
+            Local,
+            Visitante,
+            Marcador
         FROM resultados
+        WHERE {where}
+        ORDER BY Jornada, Local, Visitante
+        LIMIT 10;
     """
-    cols, rows = _run_sql(sql)
+    return sql, params, f"Ejemplos de resultados {temp or '(todas las temporadas)'}"
 
-    historial = []
-    for L, V, M in rows:
-        if _norm_team(L) == local_n and _norm_team(V) == vis_n:
-            historial.append(M)
 
-    # Si no hay historial → probabilidad genérica
-    if not historial:
-        p_local = 0.40
-        p_empate = 0.30
-        p_visitante = 0.30
-    else:
-        # Extraer goles
-        goles_local = []
-        goles_visit = []
-        for m in historial:
-            parts = m.split("-")
-            if len(parts) == 2:
-                try:
-                    gL = int(parts[0].strip())
-                    gV = int(parts[1].strip())
-                    goles_local.append(gL)
-                    goles_visit.append(gV)
-                except:
-                    pass
+def _sql_tabla_clasificacion(temp: Optional[str]):
+    where = "1=1"
+    params: tuple = ()
+    if temp:
+        where = _clean_temporada_for_where("Temporada")
+        params = (temp,)
 
-        if len(goles_local) == 0:
-            p_local = 0.40
-            p_empate = 0.30
-            p_visitante = 0.30
+    sql = f"""
+        SELECT
+            Club,
+            Puntos,
+            Ganados,
+            Empatados,
+            Perdidos
+        FROM clasificaciones
+        WHERE {where}
+        ORDER BY Puntos DESC
+        LIMIT 10;
+    """
+    return sql, params, f"Top de la clasificación {temp or '(todas las temporadas)'}"
+
+
+# ---------------------------------------------------------------------
+# Router de intención muy sencillo
+# ---------------------------------------------------------------------
+def _pick_intent(q: str):
+    q_low = q.lower()
+    temp = _guess_temporada(q_low)
+
+    if "pichichi" in q_low or "goleador" in q_low or "goles" in q_low:
+        return _sql_top_goleadores(temp)
+
+    if "valor" in q_low or "clubes mas caros" in q_low or "clubes más caros" in q_low:
+        return _sql_top_valor_clubes(temp)
+
+    if "fichaje" in q_low or "traspaso" in q_low or "transfer" in q_low:
+        return _sql_top_fichajes(temp)
+
+    if "resultado" in q_low or "marcador" in q_low:
+        return _sql_resultados(temp)
+
+    if "clasific" in q_low or "tabla" in q_low or "puntos" in q_low or "liga" in q_low:
+        return _sql_tabla_clasificacion(temp)
+
+    # fallback: clasificación
+    return _sql_tabla_clasificacion(temp)
+
+
+# ---------------------------------------------------------------------
+# Punto de entrada RAG SQL
+# ---------------------------------------------------------------------
+def ask_rag(pregunta: str) -> Dict[str, Any]:
+    try:
+        sql, params, descripcion = _pick_intent(pregunta)
+        cols, rows = _run_sql(sql, params)
+
+        df = pd.DataFrame(rows, columns=cols)
+
+        if df.empty:
+            resumen = f"No encontré datos para esa consulta en la base local. ({descripcion})"
         else:
-            import numpy as np
-            avg_L = np.mean(goles_local)
-            avg_V = np.mean(goles_visit)
-
-            total = avg_L + avg_V + 1e-6
-
-            p_local = (avg_L / total)
-            p_visitante = (avg_V / total)
-            p_empate = 1 - (p_local + p_visitante)
-
-    # Marcador esperado
-    gL = round(p_local * 3)
-    gV = round(p_visitante * 3)
-
-    marcador = f"{gL} - {gV}"
-
-    return {
-        "pronostico": marcador,
-        "p_local": round(p_local * 100, 1),
-        "p_empate": round(p_empate * 100, 1),
-        "p_visitante": round(p_visitante * 100, 1),
-    }
-
-# ----------------------------------------------------
-# Router principal SQL+Pronósticos
-# ----------------------------------------------------
-def ask_rag(pregunta: str):
-    q = pregunta.lower()
-
-    # Detecta partido: “girona vs sevilla”
-    m = re.search(r"(\w[\w\s]+)\s+vs\.?\s+(\w[\w\s]+)", q)
-    temporada = _guess_temporada(q)
-
-    if m:
-        t1 = m.group(1).strip()
-        t2 = m.group(2).strip()
-
-        pred = _predict_match(t1, t2, temporada)
+            first = df.iloc[0].to_dict()
+            resumen = f"{descripcion}. Destaca: {first}"
 
         return {
             "ok": True,
-            "tipo": "pronostico",
-            "local": t1,
-            "visitante": t2,
-            "temporada": temporada,
-            "pronostico": pred["pronostico"],
-            "probabilidades": {
-                "local": pred["p_local"],
-                "empate": pred["p_empate"],
-                "visitante": pred["p_visitante"],
-            }
+            "pregunta": pregunta,
+            "descripcion": descripcion,
+            "consulta": sql,
+            "parametros": params,
+            "columnas": cols,
+            "resultados": rows,
+            "resumen": resumen,
         }
 
-    # Si no es un partido, devuelve None → lo procesa ChatAgent
-    return None
+    except Exception as e:
+        return {"ok": False, "pregunta": pregunta, "error": str(e)}
