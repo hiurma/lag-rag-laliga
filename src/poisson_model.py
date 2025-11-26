@@ -1,234 +1,207 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
-import sqlite3, math
+import sqlite3, re
 from pathlib import Path
-from typing import Dict, Tuple, Optional, List
-
-import pandas as pd
+from typing import Dict, Tuple, Optional
+import math
 
 DB_PATH = Path("data/laliga.sqlite")
 
-# ------------------------- util Poisson -------------------------
+# ---------- Normalización de equipos ----------
+TEAM_ALIASES = {
+    # LaLiga (ajusta o añade si tu BD usa otros nombres)
+    "real madrid": "Real Madrid",
+    "r. madrid": "Real Madrid",
+    "realmadrid": "Real Madrid",
+    "fc barcelona": "FC Barcelona",
+    "barcelona": "FC Barcelona",
+    "barça": "FC Barcelona",
+    "atletico de madrid": "Atlético Madrid",
+    "atlético de madrid": "Atlético Madrid",
+    "atletico madrid": "Atlético Madrid",
+    "sevilla": "Sevilla FC",
+    "sevilla fc": "Sevilla FC",
+    "girona": "Girona FC",
+    "girona fc": "Girona FC",
+    "osasuna": "Osasuna",
+    "real sociedad": "Real Sociedad",
+    "betis": "Real Betis",
+    "real betis": "Real Betis",
+    "rayo": "Rayo Vallecano",
+    "rayo vallecano": "Rayo Vallecano",
+    "villarreal": "Villarreal",
+    "valencia": "Valencia",
+    "getafe": "Getafe",
+    "celta": "Celta de Vigo",
+    "celta de vigo": "Celta de Vigo",
+    "espanyol": "Espanyol",
+    "real oviedo": "Real Oviedo",
+    "alaves": "Alavés",
+    "alavés": "Alavés",
+    "mallorca": "Mallorca",
+    "elche": "Elche",
+    "granada": "Granada",
+    "leganes": "Leganés",
+    "leganés": "Leganés",
+    "levante": "Levante",
+}
 
-def _pois_pmf(lmbda: float, k: int) -> float:
-    # pmf = e^-λ λ^k / k!
+def norm_team(name: str) -> str:
+    s = (name or "").strip().lower()
+    s = re.sub(r"\s+", " ", s)
+    return TEAM_ALIASES.get(s, name.strip())
+
+def _get_current_season(con: sqlite3.Connection) -> Optional[str]:
     try:
-        return math.exp(-lmbda) * (lmbda ** k) / math.factorial(k)
-    except OverflowError:
-        return 0.0
+        cur = con.cursor()
+        # coge la mayor temporada alfabéticamente (funciona con "2025/2026")
+        row = cur.execute("SELECT MAX(Temporada) FROM resultados").fetchone()
+        return row[0] if row and row[0] else None
+    except Exception:
+        return None
 
-def _score_matrix(lambda_home: float, lambda_away: float, max_goals: int = 6):
-    """Matriz de probabilidades P(Home=i, Away=j)."""
-    ph = [ _pois_pmf(lambda_home, i) for i in range(max_goals + 1) ]
-    pa = [ _pois_pmf(lambda_away, j) for j in range(max_goals + 1) ]
-    # producto externo
-    mat = [[ph[i]*pa[j] for j in range(max_goals + 1)] for i in range(max_goals + 1)]
-    return mat
+# ---------- Poisson util ----------
+def _poisson_prob(lmbd: float, k: int) -> float:
+    # P(X=k) para Poisson(λ)
+    if lmbd <= 0:
+        return 0.0 if k > 0 else 1.0
+    return math.exp(-lmbd) * (lmbd ** k) / math.factorial(k)
 
-def _most_probable_score(mat) -> Tuple[int,int,float]:
-    best = (0,0,0.0)
-    for i,row in enumerate(mat):
-        for j,p in enumerate(row):
+def _grid_probs(mu_h: float, mu_a: float, max_goals: int = 6):
+    grid = []
+    best = (0, 0, 0.0)
+    p_home = p_draw = p_away = 0.0
+    for h in range(max_goals + 1):
+        ph = _poisson_prob(mu_h, h)
+        for a in range(max_goals + 1):
+            pa = _poisson_prob(mu_a, a)
+            p = ph * pa
+            grid.append(((h, a), p))
             if p > best[2]:
-                best = (i,j,p)
-    return best
-
-# -------------------- carga & fuerzas de equipos --------------------
-
-def _read_results_until(season: str, upto_matchday: Optional[int]) -> pd.DataFrame:
-    con = sqlite3.connect(DB_PATH)
-    q = """
-        SELECT Temporada, Jornada, Local, Visitante, GolesLocal, GolesVisitante
-        FROM resultados
-        WHERE REPLACE(TRIM(Temporada),'-','/') = REPLACE(TRIM(?),'-','/')
-          AND GolesLocal IS NOT NULL AND GolesVisitante IS NOT NULL
-    """
-    params: List = [season]
-    if upto_matchday is not None:
-        q += " AND Jornada <= ?"
-        params.append(upto_matchday)
-    df = pd.read_sql_query(q, con, params=params)
-    con.close()
-    # normaliza textos
-    for c in ["Local","Visitante"]:
-        df[c] = df[c].astype(str).str.strip()
-    return df
-
-def _league_averages(df: pd.DataFrame) -> Tuple[float,float]:
-    # medias por partido
-    if df.empty:
-        return 1.4, 1.1  # valores razonables por defecto
-    home_avg = df["GolesLocal"].mean()
-    away_avg = df["GolesVisitante"].mean()
-    return float(home_avg), float(away_avg)
-
-def _smooth_rate(goals: float, matches: float, prior_rate: float, alpha: float = 3.0) -> float:
-    """
-    Shrink: (g + α*μ) / (m + α), robusto con pocas jornadas (8).
-    """
-    return (goals + alpha*prior_rate) / max(1.0, (matches + alpha))
-
-def _team_strengths(df: pd.DataFrame) -> Dict[str, Dict[str, float]]:
-    """
-    Calcula rates por equipo separados casa/fuera:
-      att_home, def_home, att_away, def_away (relativos a medias liga).
-    """
-    if df.empty:
-        return {}
-
-    mu_h, mu_a = _league_averages(df)
-
-    # agregados por equipo
-    home = df.groupby("Local").agg(
-        gf=("GolesLocal","sum"),
-        ga=("GolesVisitante","sum"),
-        pj=("Local","count")
-    ).rename_axis("Team").reset_index()
-
-    away = df.groupby("Visitante").agg(
-        gf=("GolesVisitante","sum"),
-        ga=("GolesLocal","sum"),
-        pj=("Visitante","count")
-    ).rename_axis("Team").reset_index()
-
-    teams = sorted(set(home["Team"]) | set(away["Team"]))
-    out: Dict[str, Dict[str, float]] = {}
-    for t in teams:
-        h = home[home["Team"]==t]
-        a = away[away["Team"]==t]
-
-        gf_h = float(h["gf"].iloc[0]) if not h.empty else 0.0
-        ga_h = float(h["ga"].iloc[0]) if not h.empty else 0.0
-        pj_h = float(h["pj"].iloc[0]) if not h.empty else 0.0
-
-        gf_a = float(a["gf"].iloc[0]) if not a.empty else 0.0
-        ga_a = float(a["ga"].iloc[0]) if not a.empty else 0.0
-        pj_a = float(a["pj"].iloc[0]) if not a.empty else 0.0
-
-        # tasas suavizadas
-        rate_gf_h = _smooth_rate(gf_h, pj_h, mu_h)
-        rate_ga_h = _smooth_rate(ga_h, pj_h, mu_a)
-        rate_gf_a = _smooth_rate(gf_a, pj_a, mu_a)
-        rate_ga_a = _smooth_rate(ga_a, pj_a, mu_h)
-
-        # fortalezas relativas
-        att_home = rate_gf_h / max(mu_h, 1e-6)
-        def_home = rate_ga_a / max(mu_a, 1e-6)  # ojo: concedidos a domicilio referenciados a media away
-        att_away = rate_gf_a / max(mu_a, 1e-6)
-        def_away = rate_ga_h / max(mu_h, 1e-6)
-
-        out[t] = {
-            "att_home": float(att_home),
-            "def_home": float(def_home),
-            "att_away": float(att_away),
-            "def_away": float(def_away),
-        }
-    # medias liga
-    out["_mu_home"] = mu_h
-    out["_mu_away"] = mu_a
-    return out
-
-def build_strengths(season: str, upto_matchday: Optional[int]) -> Dict[str, Dict[str,float]]:
-    df = _read_results_until(season, upto_matchday)
-    return _team_strengths(df)
-
-# --------------------------- predicción ---------------------------
-
-def predict_match_poisson(
-    season: str,
-    home_team: str,
-    away_team: str,
-    upto_matchday: Optional[int] = None,
-    max_goals: int = 6
-) -> Dict:
-    """
-    Predice un partido usando fortalezas calculadas SOLO con los datos hasta `upto_matchday`.
-    """
-    strengths = build_strengths(season, upto_matchday)
-    mu_h = strengths.get("_mu_home", 1.4)
-    mu_a = strengths.get("_mu_away", 1.1)
-
-    th = strengths.get(home_team)
-    ta = strengths.get(away_team)
-    if not th or not ta:
-        raise ValueError(f"No tengo fortalezas para {home_team} o {away_team} (temporada {season}).")
-
-    # λ = μ * ataque_home * defensa_away  (y análogo para visitantes)
-    lam_home = mu_h * th["att_home"] * ta["def_away"]
-    lam_away = mu_a * ta["att_away"] * th["def_home"]
-
-    mat = _score_matrix(lam_home, lam_away, max_goals=max_goals)
-    i,j,pij = _most_probable_score(mat)
-
-    # prob 1X2
-    p_home = sum(mat[i2][j2] for i2 in range(max_goals+1) for j2 in range(max_goals+1) if i2>j2)
-    p_draw = sum(mat[i2][j2] for i2 in range(max_goals+1) for j2 in range(max_goals+1) if i2==j2)
-    p_away = 1.0 - p_home - p_draw
-
+                best = (h, a, p)
+            if h > a:
+                p_home += p
+            elif h == a:
+                p_draw += p
+            else:
+                p_away += p
     return {
-        "temporada": season,
-        "lambda_home": round(lam_home, 3),
-        "lambda_away": round(lam_away, 3),
-        "score_mas_probable": f"{home_team} {i}-{j} {away_team}",
-        "p_home": round(p_home, 3),
-        "p_draw": round(p_draw, 3),
-        "p_away": round(p_away, 3),
-        "matrix_max_goals": max_goals,
+        "best_score": (best[0], best[1]),
+        "best_prob": best[2],
+        "p_home": p_home,
+        "p_draw": p_draw,
+        "p_away": p_away,
     }
 
-# -------------------- pronósticos en bloque (Real Madrid) --------------------
+# ---------- Modelo: medias ataque/defensa ----------
+def _team_strengths(con: sqlite3.Connection, temporada: str):
+    cur = con.cursor()
+    rows = cur.execute("""
+        SELECT Local, Visitante, GolesLocal, GolesVisitante
+        FROM resultados
+        WHERE REPLACE(TRIM(Temporada), '-', '/') = REPLACE(TRIM(?), '-', '/')
+    """, (temporada,)).fetchall()
 
-def fixtures_rm_from_db(season: str, desde_j: int, hasta_j: int) -> pd.DataFrame:
+    if not rows:
+        return None
+
+    teams = {}
+    sum_home_goals = sum_away_goals = 0
+    n_matches = 0
+
+    for loc, vis, gl, gv in rows:
+        n_matches += 1
+        sum_home_goals += (gl or 0)
+        sum_away_goals += (gv or 0)
+
+        tloc = teams.setdefault(loc, {"home_scored":0, "home_conc":0, "home_played":0,
+                                      "away_scored":0, "away_conc":0, "away_played":0})
+        tvis = teams.setdefault(vis, {"home_scored":0, "home_conc":0, "home_played":0,
+                                      "away_scored":0, "away_conc":0, "away_played":0})
+
+        tloc["home_scored"] += (gl or 0)
+        tloc["home_conc"]   += (gv or 0)
+        tloc["home_played"] += 1
+
+        tvis["away_scored"] += (gv or 0)
+        tvis["away_conc"]   += (gl or 0)
+        tvis["away_played"] += 1
+
+    avg_home = sum_home_goals / max(n_matches,1)
+    avg_away = sum_away_goals / max(n_matches,1)
+
+    strengths = {}
+    for team, st in teams.items():
+        atk_h = (st["home_scored"]/st["home_played"]) / avg_home if st["home_played"] else 1.0
+        def_h = (st["home_conc"]/st["home_played"])   / avg_away if st["home_played"] else 1.0
+        atk_a = (st["away_scored"]/st["away_played"]) / avg_away if st["away_played"] else 1.0
+        def_a = (st["away_conc"]/st["away_played"])   / avg_home if st["away_played"] else 1.0
+        strengths[team] = (atk_h, def_h, atk_a, def_a)
+
+    return avg_home, avg_away, strengths
+
+def predict_match_poisson(home_raw: str, away_raw: str, temporada: Optional[str]=None):
     """
-    Lee de la tabla resultados los partidos del Real Madrid entre jornadas dadas,
-    aunque no tengan marcador (sirven de calendario).
+    Devuelve:
+      {
+        'temporada': '2025/2026',
+        'home': 'Real Madrid',
+        'away': 'FC Barcelona',
+        'mu_home': 1.62, 'mu_away': 1.21,
+        'pred_score': '2-1',
+        'p_home': 0.45, 'p_draw': 0.27, 'p_away': 0.28
+      }
     """
     con = sqlite3.connect(DB_PATH)
-    q = """
-    SELECT Jornada, Local, Visitante, Marcador
-    FROM resultados
-    WHERE REPLACE(TRIM(Temporada),'-','/') = REPLACE(TRIM(?),'-','/')
-      AND Jornada BETWEEN ? AND ?
-      AND (Local='Real Madrid' OR Visitante='Real Madrid')
-    ORDER BY Jornada
-    """
-    df = pd.read_sql_query(q, con, params=[season, desde_j, hasta_j])
+    if not temporada:
+        temporada = _get_current_season(con)
+
+    # fuerzas de equipos
+    base = _team_strengths(con, temporada)
+    if not base:
+        con.close()
+        raise RuntimeError(f"No hay resultados en BD para temporada {temporada}.")
+    avg_home, avg_away, strengths = base
+
+    # normalizamos nombres
+    home = norm_team(home_raw)
+    away = norm_team(away_raw)
+
+    # intentar “match” tolerante si no están exactos
+    def _closest(tname: str) -> Optional[str]:
+        tname_n = tname.lower()
+        # exacto
+        if tname in strengths:
+            return tname
+        # coincide por “in”
+        for k in strengths.keys():
+            if tname_n in k.lower() or k.lower() in tname_n:
+                return k
+        return None
+
+    h = _closest(home)
+    a = _closest(away)
+    if not h or not a:
+        con.close()
+        raise RuntimeError(f"No encuentro equipos en BD: '{home_raw}' vs '{away_raw}'")
+
+    atk_h, def_h, atk_a, def_a = strengths[h]
+    mu_home = max(0.05, avg_home * atk_h * def_a)
+    mu_away = max(0.05, avg_away * atk_a * def_h)
+
+    grid = _grid_probs(mu_home, mu_away, max_goals=6)
+    s_h, s_a = grid["best_score"]
+
+    out = {
+        "temporada": temporada,
+        "home": h,
+        "away": a,
+        "mu_home": mu_home,
+        "mu_away": mu_away,
+        "pred_score": f"{s_h}-{s_a}",
+        "p_home": grid["p_home"],
+        "p_draw": grid["p_draw"],
+        "p_away": grid["p_away"],
+    }
     con.close()
-    for c in ["Local","Visitante"]:
-        df[c] = df[c].astype(str).str.strip()
-    return df
-
-def bulk_predict_rm(season: str, desde_j: int, hasta_j: int, upto_matchday_for_fit: int) -> pd.DataFrame:
-    """
-    Predice todas las jornadas de RM en [desde_j, hasta_j] usando
-    fortalezas estimadas hasta `upto_matchday_for_fit` (por ejemplo 8).
-    """
-    cal = fixtures_rm_from_db(season, desde_j, hasta_j)
-    if cal.empty:
-        # no hay calendario en DB → devolvemos DF vacío con columnas estándar
-        return pd.DataFrame(columns=["Jornada","Local","Visitante","Pronóstico","P(1)","P(X)","P(2)"])
-
-    rows = []
-    for _,r in cal.iterrows():
-        try:
-            pred = predict_match_poisson(season, r["Local"], r["Visitante"], upto_matchday=upto_matchday_for_fit)
-            rows.append({
-                "Jornada": int(r["Jornada"]),
-                "Local": r["Local"],
-                "Visitante": r["Visitante"],
-                "Pronóstico": pred["score_mas_probable"],
-                "P(1)": pred["p_home"],
-                "P(X)": pred["p_draw"],
-                "P(2)": pred["p_away"],
-            })
-        except Exception as e:
-            rows.append({
-                "Jornada": int(r["Jornada"]),
-                "Local": r["Local"],
-                "Visitante": r["Visitante"],
-                "Pronóstico": f"(error: {e})",
-                "P(1)": None, "P(X)": None, "P(2)": None
-            })
-
-    out = pd.DataFrame(rows).sort_values("Jornada")
     return out
