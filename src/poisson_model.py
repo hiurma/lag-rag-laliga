@@ -1,39 +1,54 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
-import sqlite3, re
+import sqlite3
+import re
 from pathlib import Path
-from typing import Dict, Tuple, Optional
+from typing import Dict, Optional, List, Tuple
 import math
 
 DB_PATH = Path("data/laliga.sqlite")
 
-# ---------- Normalización de equipos ----------
+# --------------------------------------------------
+# Normalización de equipos
+# --------------------------------------------------
 TEAM_ALIASES = {
-    # LaLiga (ajusta o añade si tu BD usa otros nombres)
     "real madrid": "Real Madrid",
     "r. madrid": "Real Madrid",
     "realmadrid": "Real Madrid",
+    "rm": "Real Madrid",
+
     "fc barcelona": "FC Barcelona",
     "barcelona": "FC Barcelona",
     "barça": "FC Barcelona",
+    "fcb": "FC Barcelona",
+
     "atletico de madrid": "Atlético Madrid",
     "atlético de madrid": "Atlético Madrid",
     "atletico madrid": "Atlético Madrid",
+    "atm": "Atlético Madrid",
+
     "sevilla": "Sevilla FC",
     "sevilla fc": "Sevilla FC",
+
     "girona": "Girona FC",
     "girona fc": "Girona FC",
+
     "osasuna": "Osasuna",
     "real sociedad": "Real Sociedad",
+
     "betis": "Real Betis",
     "real betis": "Real Betis",
+
     "rayo": "Rayo Vallecano",
     "rayo vallecano": "Rayo Vallecano",
+
     "villarreal": "Villarreal",
     "valencia": "Valencia",
     "getafe": "Getafe",
-    "celta": "Celta de Vigo",
+
     "celta de vigo": "Celta de Vigo",
+    "celta": "Celta de Vigo",
+
     "espanyol": "Espanyol",
     "real oviedo": "Real Oviedo",
     "alaves": "Alavés",
@@ -51,157 +66,196 @@ def norm_team(name: str) -> str:
     s = re.sub(r"\s+", " ", s)
     return TEAM_ALIASES.get(s, name.strip())
 
-def _get_current_season(con: sqlite3.Connection) -> Optional[str]:
-    try:
-        cur = con.cursor()
-        # coge la mayor temporada alfabéticamente (funciona con "2025/2026")
-        row = cur.execute("SELECT MAX(Temporada) FROM resultados").fetchone()
-        return row[0] if row and row[0] else None
-    except Exception:
-        return None
 
-# ---------- Poisson util ----------
+# --------------------------------------------------
+# Utilidades Poisson
+# --------------------------------------------------
 def _poisson_prob(lmbd: float, k: int) -> float:
-    # P(X=k) para Poisson(λ)
     if lmbd <= 0:
-        return 0.0 if k > 0 else 1.0
+        return 1.0 if k == 0 else 0.0
     return math.exp(-lmbd) * (lmbd ** k) / math.factorial(k)
 
+
 def _grid_probs(mu_h: float, mu_a: float, max_goals: int = 6):
-    grid = []
-    best = (0, 0, 0.0)
+    best_score = (0, 0)
+    best_p = 0
     p_home = p_draw = p_away = 0.0
-    for h in range(max_goals + 1):
-        ph = _poisson_prob(mu_h, h)
-        for a in range(max_goals + 1):
-            pa = _poisson_prob(mu_a, a)
-            p = ph * pa
-            grid.append(((h, a), p))
-            if p > best[2]:
-                best = (h, a, p)
-            if h > a:
+
+    for gh in range(max_goals + 1):
+        for ga in range(max_goals + 1):
+            p = _poisson_prob(mu_h, gh) * _poisson_prob(mu_a, ga)
+            if p > best_p:
+                best_p = p
+                best_score = (gh, ga)
+            if gh > ga:
                 p_home += p
-            elif h == a:
+            elif gh == ga:
                 p_draw += p
             else:
                 p_away += p
+
     return {
-        "best_score": (best[0], best[1]),
-        "best_prob": best[2],
+        "best_score": best_score,
         "p_home": p_home,
         "p_draw": p_draw,
         "p_away": p_away,
     }
 
-# ---------- Modelo: medias ataque/defensa ----------
-def _team_strengths(con: sqlite3.Connection, temporada: str):
-    cur = con.cursor()
-    rows = cur.execute("""
-        SELECT Local, Visitante, GolesLocal, GolesVisitante
-        FROM resultados
-        WHERE REPLACE(TRIM(Temporada), '-', '/') = REPLACE(TRIM(?), '-', '/')
-    """, (temporada,)).fetchall()
 
-    if not rows:
-        return None
+# --------------------------------------------------
+# Temporadas recientes
+# --------------------------------------------------
+def _get_recent_seasons(con: sqlite3.Connection, max_seasons: int = 3) -> List[str]:
+    cur = con.cursor()
+    rows = cur.execute(
+        "SELECT DISTINCT Temporada FROM resultados ORDER BY Temporada DESC"
+    ).fetchall()
+    return [r[0] for r in rows][:max_seasons]
+
+
+def _get_current_season(con: sqlite3.Connection) -> Optional[str]:
+    cur = con.cursor()
+    row = cur.execute("SELECT MAX(Temporada) FROM resultados").fetchone()
+    return row[0] if row and row[0] else None
+
+
+# --------------------------------------------------
+# Fuerza de equipos con historial + suavizado bayesiano + decay
+# --------------------------------------------------
+def _team_strengths_multiseason(
+    con: sqlite3.Connection,
+    temporada_objetivo: str,
+    max_seasons=3,
+    decay=0.7,
+    prior_k=5.0
+):
+    seasons = _get_recent_seasons(con, max_seasons=max_seasons)
+    if not seasons:
+        raise RuntimeError("No hay temporadas en BD.")
+
+    # Pesos: temporada más actual → peso 1
+    season_w = {t: decay ** i for i, t in enumerate(seasons)}
+
+    # Cargar todos los partidos relevantes
+    qmarks = ",".join("?" for _ in seasons)
+    rows = con.execute(
+        f"SELECT Temporada, Local, Visitante, GolesLocal, GolesVisitante "
+        f"FROM resultados WHERE Temporada IN ({qmarks})",
+        seasons
+    ).fetchall()
 
     teams = {}
-    sum_home_goals = sum_away_goals = 0
-    n_matches = 0
+    total_w_matches = 0
+    sum_gl = 0
+    sum_gv = 0
 
-    for loc, vis, gl, gv in rows:
-        n_matches += 1
-        sum_home_goals += (gl or 0)
-        sum_away_goals += (gv or 0)
+    for t, loc, vis, gl, gv in rows:
+        w = season_w[t]
+        gl = gl or 0
+        gv = gv or 0
 
-        tloc = teams.setdefault(loc, {"home_scored":0, "home_conc":0, "home_played":0,
-                                      "away_scored":0, "away_conc":0, "away_played":0})
-        tvis = teams.setdefault(vis, {"home_scored":0, "home_conc":0, "home_played":0,
-                                      "away_scored":0, "away_conc":0, "away_played":0})
+        sum_gl += w * gl
+        sum_gv += w * gv
+        total_w_matches += w
 
-        tloc["home_scored"] += (gl or 0)
-        tloc["home_conc"]   += (gv or 0)
-        tloc["home_played"] += 1
+        def init_team(team):
+            return {
+                "home_scored": 0, "home_conc": 0, "home_played": 0,
+                "away_scored": 0, "away_conc": 0, "away_played": 0
+            }
 
-        tvis["away_scored"] += (gv or 0)
-        tvis["away_conc"]   += (gl or 0)
-        tvis["away_played"] += 1
+        if loc not in teams:
+            teams[loc] = init_team(loc)
+        if vis not in teams:
+            teams[vis] = init_team(vis)
 
-    avg_home = sum_home_goals / max(n_matches,1)
-    avg_away = sum_away_goals / max(n_matches,1)
+        teams[loc]["home_scored"] += w * gl
+        teams[loc]["home_conc"] += w * gv
+        teams[loc]["home_played"] += w
+
+        teams[vis]["away_scored"] += w * gv
+        teams[vis]["away_conc"] += w * gl
+        teams[vis]["away_played"] += w
+
+    avg_home = sum_gl / max(total_w_matches, 1)
+    avg_away = sum_gv / max(total_w_matches, 1)
+
+    def shrink(value, n):
+        return (value * n + 1.0 * prior_k) / (n + prior_k)
 
     strengths = {}
     for team, st in teams.items():
-        atk_h = (st["home_scored"]/st["home_played"]) / avg_home if st["home_played"] else 1.0
-        def_h = (st["home_conc"]/st["home_played"])   / avg_away if st["home_played"] else 1.0
-        atk_a = (st["away_scored"]/st["away_played"]) / avg_away if st["away_played"] else 1.0
-        def_a = (st["away_conc"]/st["away_played"])   / avg_home if st["away_played"] else 1.0
+        n_h = st["home_played"]
+        n_a = st["away_played"]
+
+        atk_h_raw = (st["home_scored"] / n_h) / avg_home if n_h > 0 else 1
+        def_h_raw = (st["home_conc"] / n_h) / avg_away if n_h > 0 else 1
+        atk_a_raw = (st["away_scored"] / n_a) / avg_away if n_a > 0 else 1
+        def_a_raw = (st["away_conc"] / n_a) / avg_home if n_a > 0 else 1
+
+        atk_h = shrink(atk_h_raw, n_h)
+        def_h = shrink(def_h_raw, n_h)
+        atk_a = shrink(atk_a_raw, n_a)
+        def_a = shrink(def_a_raw, n_a)
+
         strengths[team] = (atk_h, def_h, atk_a, def_a)
 
     return avg_home, avg_away, strengths
 
-def predict_match_poisson(home_raw: str, away_raw: str, temporada: Optional[str]=None):
-    """
-    Devuelve:
-      {
-        'temporada': '2025/2026',
-        'home': 'Real Madrid',
-        'away': 'FC Barcelona',
-        'mu_home': 1.62, 'mu_away': 1.21,
-        'pred_score': '2-1',
-        'p_home': 0.45, 'p_draw': 0.27, 'p_away': 0.28
-      }
-    """
+
+# --------------------------------------------------
+# Predicción principal
+# --------------------------------------------------
+def predict_match_poisson(home_raw: str, away_raw: str, temporada: Optional[str] = None):
     con = sqlite3.connect(DB_PATH)
-    if not temporada:
-        temporada = _get_current_season(con)
-
-    # fuerzas de equipos
-    base = _team_strengths(con, temporada)
-    if not base:
+    temporada_obj = temporada or _get_current_season(con)
+    if not temporada_obj:
         con.close()
-        raise RuntimeError(f"No hay resultados en BD para temporada {temporada}.")
-    avg_home, avg_away, strengths = base
+        raise RuntimeError("No hay temporada disponible en BD.")
 
-    # normalizamos nombres
+    avg_home, avg_away, strengths = _team_strengths_multiseason(
+        con,
+        temporada_obj,
+        max_seasons=3,
+        decay=0.7,
+        prior_k=5.0
+    )
+
     home = norm_team(home_raw)
     away = norm_team(away_raw)
 
-    # intentar “match” tolerante si no están exactos
-    def _closest(tname: str) -> Optional[str]:
-        tname_n = tname.lower()
-        # exacto
-        if tname in strengths:
-            return tname
-        # coincide por “in”
-        for k in strengths.keys():
-            if tname_n in k.lower() or k.lower() in tname_n:
-                return k
+    def find_team(name):
+        for t in strengths:
+            if name.lower() in t.lower() or t.lower() in name.lower():
+                return t
         return None
 
-    h = _closest(home)
-    a = _closest(away)
+    h = find_team(home)
+    a = find_team(away)
+
     if not h or not a:
         con.close()
-        raise RuntimeError(f"No encuentro equipos en BD: '{home_raw}' vs '{away_raw}'")
+        raise RuntimeError(f"No encuentro equipos en BD: {home_raw} vs {away_raw}")
 
     atk_h, def_h, atk_a, def_a = strengths[h]
-    mu_home = max(0.05, avg_home * atk_h * def_a)
+
+    # Home advantage (+15%)
+    home_adv = 1.15
+
+    mu_home = max(0.05, avg_home * atk_h * def_a * home_adv)
     mu_away = max(0.05, avg_away * atk_a * def_h)
 
-    grid = _grid_probs(mu_home, mu_away, max_goals=6)
-    s_h, s_a = grid["best_score"]
+    grid = _grid_probs(mu_home, mu_away)
 
-    out = {
-        "temporada": temporada,
+    con.close()
+    return {
+        "temporada": temporada_obj,
         "home": h,
         "away": a,
         "mu_home": mu_home,
         "mu_away": mu_away,
-        "pred_score": f"{s_h}-{s_a}",
+        "pred_score": f"{grid['best_score'][0]}-{grid['best_score'][1]}",
         "p_home": grid["p_home"],
         "p_draw": grid["p_draw"],
         "p_away": grid["p_away"],
     }
-    con.close()
-    return out
