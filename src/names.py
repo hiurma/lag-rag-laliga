@@ -5,27 +5,77 @@ import unicodedata, re
 
 # Amplía este diccionario cuando veas variantes nuevas
 _ALIASES = {
-    "real madrid": {"real madrid", "real madrid cf", "rma", "esp_rma", "rm"},
-    "fc barcelona": {"barcelona", "fc barcelona", "fcb", "esp_bar"},
-    "atletico de madrid": {"atlético de madrid", "atletico de madrid", "atlético madrid", "atletico madrid", "atm", "esp_atm"},
-    "girona fc": {"girona", "girona fc", "esp_gir"},
-    "sevilla fc": {"sevilla", "sevilla fc", "esp_sev"},
-    "rcd espanyol": {"espanyol", "rcd espanyol", "esp_esp"},
-    "osasuna": {"osasuna", "ca osasuna", "esp_osa"},
-    "real sociedad": {"real sociedad", "esp_rso", "rso"},
-    "villarreal": {"villarreal", "villarreal cf", "esp_vil"},
-    "real betis": {"betis", "real betis", "esp_bet"},
-    "athletic club": {"athletic", "athletic club", "ath bilbao", "esp_ath"},
-    "celta de vigo": {"celta", "celta vigo", "rc celta", "esp_cel"},
-    "rayo vallecano": {"rayo", "rayo vallecano", "esp_ray"},
-    "valencia": {"valencia", "valencia cf", "esp_val"},
-    "mallorca": {"mallorca", "rcd mallorca", "esp_mal"},
-    "alaves": {"alaves", "deportivo alaves", "esp_ala"},
-    "getafe": {"getafe", "getafe cf", "esp_get"},
-    "elche": {"elche", "elche cf", "esp_elc"},
-    "osasuna": {"osasuna", "ca osasuna", "esp_osa"},
-    "real oviedo": {"real oviedo", "oviedo", "esp_ovi"},
-    "girona": {"girona", "girona fc", "esp_gir"},
+    # ➤ Real Madrid
+    "real madrid": "Real Madrid",
+    "r. madrid": "Real Madrid",
+    "madrid": "Real Madrid",
+    "realmadrid": "Real Madrid",
+
+    # ➤ FC Barcelona
+    "fc barcelona": "FC Barcelona",
+    "barcelona": "FC Barcelona",
+    "barça": "FC Barcelona",
+    "fcb": "FC Barcelona",
+
+    # ➤ Atlético de Madrid
+    "atletico de madrid": "Atletico de Madrid",
+    "atlético de madrid": "Atletico de Madrid",
+    "atletico madrid": "Atletico de Madrid",
+    "atlético madrid": "Atletico de Madrid",
+    "atm": "Atletico de Madrid",
+
+    # ➤ Sevilla FC
+    "sevilla": "Sevilla FC",
+    "sevilla fc": "Sevilla FC",
+
+    # ➤ Real Sociedad
+    "real sociedad": "Real Sociedad",
+    "sociedad": "Real Sociedad",
+
+    # ➤ RCD Mallorca
+    "mallorca": "RCD Mallorca",
+    "rcd mallorca": "RCD Mallorca",
+
+    # ➤ Osasuna
+    "osasuna": "Osasuna",
+
+    # ➤ Levante UD
+    "levante": "Levante UD",
+    "levante ud": "Levante UD",
+
+    # ➤ Elche CF
+    "elche": "Elche CF",
+    "elche cf": "Elche CF",
+
+    # ➤ Real Betis
+    "betis": "Betis",
+    "real betis": "Betis",
+
+    # ➤ Getafe
+    "getafe": "Getafe",
+
+    # ➤ Celta de Vigo
+    "celta": "Celta de Vigo",
+    "celta de vigo": "Celta de Vigo",
+
+    # ➤ Villarreal
+    "villarreal": "Villarreal",
+
+    # ➤ Valencia
+    "valencia": "Valencia",
+    "valencia cf": "Valencia",
+
+    # ➤ Rayo Vallecano
+    "rayo": "Rayo Vallecano",
+    "rayo vallecano": "Rayo Vallecano",
+
+    # ➤ Athletic Club
+    "athletic": "Athletic Club",
+    "athletic club": "Athletic Club",
+
+    # ➤ Girona
+    "girona": "Girona",
+    "girona fc": "Girona",
 }
 
 def _strip(s: str) -> str:
