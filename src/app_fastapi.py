@@ -13,7 +13,16 @@ from pathlib import Path
 import pandas as pd
 
 # 👇 Backend de chat (SQL + Poisson + LLM)
-from chat_agent import ChatAgent
+try:
+    # Cuando se ejecuta como paquete: `python -m src.app_fastapi`
+    from .chat_agent import ChatAgent  # type: ignore[attr-defined]
+except ImportError:
+    # Cuando se ejecuta directamente: `python src/app_fastapi.py`
+    import sys
+    from pathlib import Path
+
+    sys.path.append(str(Path(__file__).resolve().parent))
+    from chat_agent import ChatAgent
 
 # 👇 Para gráficos
 import matplotlib
