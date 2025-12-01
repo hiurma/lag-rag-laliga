@@ -17,3 +17,4 @@ lxml>=5.2
 
 markdown>=3.4.4
 tabulate
+matplotlib>=3.8.0
