@@ -98,7 +98,46 @@ def chat_endpoint(body: ChatBody):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# =====================================================
+# 📊 ENDPOINT DE VISUALIZACIÓN
+# =====================================================
+from io import BytesIO
+import base64
+import matplotlib.pyplot as plt
+import pandas as pd
+import sqlite3
 
+@app.get("/visual")
+def generar_visual():
+    try:
+        # Conexión a la BD
+        con = sqlite3.connect("data/laliga.sqlite")
+        df = pd.read_sql_query("""
+            SELECT Club, Puntos
+            FROM clasificaciones
+            ORDER BY Puntos DESC
+            LIMIT 10
+        """, con)
+        con.close()
+
+        # Crear gráfica
+        plt.figure(figsize=(8,5))
+        plt.bar(df["Club"], df["Puntos"])
+        plt.xticks(rotation=45, ha="right")
+        plt.title("Top Clasificación (Visualización Automática)")
+        plt.tight_layout()
+
+        # Convertir a base64
+        buf = BytesIO()
+        plt.savefig(buf, format="png")
+        plt.close()
+        buf.seek(0)
+        img_b64 = base64.b64encode(buf.read()).decode("utf-8")
+
+        return {"ok": True, "image": img_b64}
+
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
 # ---------------------------------------------------------------------
 # Helpers internos para leer de SQLite
 # ---------------------------------------------------------------------
