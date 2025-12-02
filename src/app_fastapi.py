@@ -19,9 +19,9 @@ try:
 except ImportError:
     # Cuando se ejecuta directamente: `python src/app_fastapi.py`
     import sys
-    from pathlib import Path
+    from pathlib import Path as PPath
 
-    sys.path.append(str(Path(__file__).resolve().parent))
+    sys.path.append(str(PPath(__file__).resolve().parent))
     from chat_agent import ChatAgent
 
 # 👇 Para gráficos
@@ -29,6 +29,8 @@ import matplotlib
 matplotlib.use("Agg")  # backend sin interfaz gráfica (para Render)
 import matplotlib.pyplot as plt
 import io
+from io import BytesIO
+import base64
 
 # ---------------------------------------------------------------------
 # Configuración básica
@@ -76,6 +78,7 @@ def root():
         "endpoints": [
             "/health",
             "/chat",
+            "/visual",
             "/plot/puntos_equipo",
             "/plot/top_goleadores",
         ],
@@ -98,20 +101,29 @@ def chat_endpoint(body: ChatBody):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ---------------------------------------------------------------------
+# Helper conexión BD
+# ---------------------------------------------------------------------
+
+def _connect_db():
+    if not DB_PATH.exists():
+        raise HTTPException(status_code=500, detail=f"No encuentro la BD en {DB_PATH}")
+    return sqlite3.connect(DB_PATH)
+
+
 # =====================================================
-# 📊 ENDPOINT DE VISUALIZACIÓN
+# 📊 ENDPOINT DE VISUALIZACIÓN PARA EL BOTÓN DEL CHAT
 # =====================================================
-from io import BytesIO
-import base64
-import matplotlib.pyplot as plt
-import pandas as pd
-import sqlite3
 
 @app.get("/visual")
 def generar_visual():
+    """
+    Devuelve una imagen PNG (base64) con la clasificación top-10,
+    para ser consumida desde el frontend.
+    """
     try:
-        # Conexión a la BD
-        con = sqlite3.connect("data/laliga.sqlite")
+        con = _connect_db()
         df = pd.read_sql_query("""
             SELECT Club, Puntos
             FROM clasificaciones
@@ -120,11 +132,14 @@ def generar_visual():
         """, con)
         con.close()
 
+        if df.empty:
+            return {"ok": False, "error": "No hay datos en la tabla 'clasificaciones'."}
+
         # Crear gráfica
-        plt.figure(figsize=(8,5))
+        plt.figure(figsize=(8, 5))
         plt.bar(df["Club"], df["Puntos"])
         plt.xticks(rotation=45, ha="right")
-        plt.title("Top Clasificación (Visualización Automática)")
+        plt.title("Top Clasificación (Visualización automática)")
         plt.tight_layout()
 
         # Convertir a base64
@@ -138,14 +153,6 @@ def generar_visual():
 
     except Exception as e:
         return {"ok": False, "error": str(e)}
-# ---------------------------------------------------------------------
-# Helpers internos para leer de SQLite
-# ---------------------------------------------------------------------
-
-def _connect_db():
-    if not DB_PATH.exists():
-        raise HTTPException(status_code=500, detail=f"No encuentro la BD en {DB_PATH}")
-    return sqlite3.connect(DB_PATH)
 
 
 # ---------------------------------------------------------------------
@@ -303,4 +310,3 @@ def plot_top_goleadores(
     buf.seek(0)
 
     return Response(content=buf.getvalue(), media_type="image/png")
-
