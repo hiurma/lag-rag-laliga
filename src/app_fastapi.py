@@ -128,7 +128,7 @@ def generar_visual():
             SELECT Club, Puntos
             FROM clasificaciones
             ORDER BY Puntos DESC
-            LIMIT 10
+            LIMIT 20
         """, con)
         con.close()
 
@@ -139,7 +139,7 @@ def generar_visual():
         plt.figure(figsize=(8, 5))
         plt.bar(df["Club"], df["Puntos"])
         plt.xticks(rotation=45, ha="right")
-        plt.title("Top Clasificación (Visualización automática)")
+        plt.title("Top Clasificación ultimos 5 años (Visualización automática)")
         plt.tight_layout()
 
         # Convertir a base64
